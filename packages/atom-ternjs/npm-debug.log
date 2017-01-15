@@ -1,0 +1,86 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/Cellar/node/7.2.1/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'tern-node-express' ]
+2 info using npm@4.0.5
+3 info using node@v7.2.1
+4 silly loadCurrentTree Starting
+5 silly install loadCurrentTree
+6 silly install readLocalPackageData
+7 silly fetchPackageMetaData tern-node-express
+8 silly fetchNamedPackageData tern-node-express
+9 silly mapToRegistry name tern-node-express
+10 silly mapToRegistry using default registry
+11 silly mapToRegistry registry https://registry.npmjs.org/
+12 silly mapToRegistry data Result {
+12 silly mapToRegistry   raw: 'tern-node-express',
+12 silly mapToRegistry   scope: null,
+12 silly mapToRegistry   escapedName: 'tern-node-express',
+12 silly mapToRegistry   name: 'tern-node-express',
+12 silly mapToRegistry   rawSpec: '',
+12 silly mapToRegistry   spec: 'latest',
+12 silly mapToRegistry   type: 'tag' }
+13 silly mapToRegistry uri https://registry.npmjs.org/tern-node-express
+14 verbose request uri https://registry.npmjs.org/tern-node-express
+15 verbose request no auth needed
+16 info attempt registry request try #1 at 4:57:56 PM
+17 verbose request id 504a9ab45e4188e1
+18 http request GET https://registry.npmjs.org/tern-node-express
+19 info retry will retry, error on last attempt: Error: tunneling socket could not be established, statusCode=502
+20 info attempt registry request try #2 at 4:58:59 PM
+21 http request GET https://registry.npmjs.org/tern-node-express
+22 info retry will retry, error on last attempt: Error: tunneling socket could not be established, statusCode=502
+23 info attempt registry request try #3 at 5:00:52 PM
+24 http request GET https://registry.npmjs.org/tern-node-express
+25 silly fetchPackageMetaData Error: tunneling socket could not be established, statusCode=502
+25 silly fetchPackageMetaData     at ClientRequest.onConnect (/usr/local/lib/node_modules/npm/node_modules/request/node_modules/tunnel-agent/index.js:165:19)
+25 silly fetchPackageMetaData     at ClientRequest.g (events.js:292:16)
+25 silly fetchPackageMetaData     at emitThree (events.js:116:13)
+25 silly fetchPackageMetaData     at ClientRequest.emit (events.js:194:7)
+25 silly fetchPackageMetaData     at Socket.socketOnData (_http_client.js:394:11)
+25 silly fetchPackageMetaData     at emitOne (events.js:96:13)
+25 silly fetchPackageMetaData     at Socket.emit (events.js:188:7)
+25 silly fetchPackageMetaData     at readableAddChunk (_stream_readable.js:176:18)
+25 silly fetchPackageMetaData     at Socket.Readable.push (_stream_readable.js:134:10)
+25 silly fetchPackageMetaData     at TCP.onread (net.js:551:20)
+25 silly fetchPackageMetaData  error for tern-node-express { Error: tunneling socket could not be established, statusCode=502
+25 silly fetchPackageMetaData     at ClientRequest.onConnect (/usr/local/lib/node_modules/npm/node_modules/request/node_modules/tunnel-agent/index.js:165:19)
+25 silly fetchPackageMetaData     at ClientRequest.g (events.js:292:16)
+25 silly fetchPackageMetaData     at emitThree (events.js:116:13)
+25 silly fetchPackageMetaData     at ClientRequest.emit (events.js:194:7)
+25 silly fetchPackageMetaData     at Socket.socketOnData (_http_client.js:394:11)
+25 silly fetchPackageMetaData     at emitOne (events.js:96:13)
+25 silly fetchPackageMetaData     at Socket.emit (events.js:188:7)
+25 silly fetchPackageMetaData     at readableAddChunk (_stream_readable.js:176:18)
+25 silly fetchPackageMetaData     at Socket.Readable.push (_stream_readable.js:134:10)
+25 silly fetchPackageMetaData     at TCP.onread (net.js:551:20) code: 'ECONNRESET' }
+26 silly rollbackFailedOptional Starting
+27 silly rollbackFailedOptional Finishing
+28 silly runTopLevelLifecycles Finishing
+29 silly install printInstalled
+30 verbose stack Error: tunneling socket could not be established, statusCode=502
+30 verbose stack     at ClientRequest.onConnect (/usr/local/lib/node_modules/npm/node_modules/request/node_modules/tunnel-agent/index.js:165:19)
+30 verbose stack     at ClientRequest.g (events.js:292:16)
+30 verbose stack     at emitThree (events.js:116:13)
+30 verbose stack     at ClientRequest.emit (events.js:194:7)
+30 verbose stack     at Socket.socketOnData (_http_client.js:394:11)
+30 verbose stack     at emitOne (events.js:96:13)
+30 verbose stack     at Socket.emit (events.js:188:7)
+30 verbose stack     at readableAddChunk (_stream_readable.js:176:18)
+30 verbose stack     at Socket.Readable.push (_stream_readable.js:134:10)
+30 verbose stack     at TCP.onread (net.js:551:20)
+31 verbose cwd /Users/home/.atom/packages/atom-ternjs
+32 error Darwin 16.3.0
+33 error argv "/usr/local/Cellar/node/7.2.1/bin/node" "/usr/local/bin/npm" "install" "tern-node-express"
+34 error node v7.2.1
+35 error npm  v4.0.5
+36 error code ECONNRESET
+37 error network tunneling socket could not be established, statusCode=502
+38 error network This is most likely not a problem with npm itself
+38 error network and is related to network connectivity.
+38 error network In most cases you are behind a proxy or have bad network settings.
+38 error network
+38 error network If you are behind a proxy, please make sure that the
+38 error network 'proxy' config is set properly.  See: 'npm help config'
+39 verbose exit [ 1, true ]

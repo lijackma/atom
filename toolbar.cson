@@ -1,0 +1,49 @@
+# This file is used by Flex Tool Bar to create buttons on your Tool Bar.
+# For more information how to use this package and create your own buttons,
+#   read the documentation on https://atom.io/packages/flex-tool-bar
+
+[
+  {
+    type: "url"
+    icon: "octoface"
+    url: "https://github.com/bierma"
+    tooltip: "Github 主页"
+    style:
+      color: "#FA4F28"
+  }
+  {
+    type: "button"
+    icon: "columns"
+    tooltip: "分割列"
+    iconset: "fa"
+    callback: ["pane:split-right"]
+    style:
+      color: "rgba(0, 193, 210, 1)"
+  }
+  {
+    type: "button"
+    icon: "markdown"
+    callback: "markdown-preview:toggle"
+    tooltip: "markdown 预览"
+    disable: "!markdown"
+    style:
+      color: "#e90f92"
+  }
+  {
+    type: "url"
+    icon: "book"
+    tooltip: "浏览器打开"
+    url: "http://localhost:8080"
+    style:
+      color: "rgba(77, 199, 31, 1)"
+  }
+  {
+    type: "button"
+    icon: "search"
+    callback: "fuzzy-grep:toggle"
+    tooltip: "搜索"
+  }
+  {
+    type: "spacer"
+  }
+]
