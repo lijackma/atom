@@ -5,7 +5,8 @@
 [
   {
     type: "button"
-    icon: "octoface"
+    icon: "github"
+    iconset: "fa"
     callback: ["open-on-github:file"]
     tooltip: "Github 主页"
     style:
