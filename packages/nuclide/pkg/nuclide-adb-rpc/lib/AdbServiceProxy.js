@@ -102,6 +102,88 @@ module.exports = _client => {
     });
   };
 
+  remoteModule.getPidFromPackageName = function (arg0, arg1) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "adbPath",
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 38
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "packageName",
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 39
+        },
+        kind: "string"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("AdbService/getPidFromPackageName", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 40
+        },
+        kind: "number"
+      });
+    });
+  };
+
+  remoteModule.forwardJdwpPortToPid = function (arg0, arg1, arg2) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "adbPath",
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 45
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "tcpPort",
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 46
+        },
+        kind: "number"
+      }
+    }, {
+      name: "pid",
+      type: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 47
+        },
+        kind: "number"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("AdbService/forwardJdwpPortToPid", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 48
+        },
+        kind: "string"
+      });
+    });
+  };
+
   return remoteModule;
 };
 
@@ -197,6 +279,22 @@ Object.defineProperty(module.exports, "defs", {
           line: 16
         },
         name: "architecture",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 16
+          },
+          kind: "string"
+        },
+        optional: false
+      }, {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 16
+        },
+        name: "model",
         type: {
           location: {
             type: "source",
@@ -354,6 +452,124 @@ Object.defineProperty(module.exports, "defs", {
             type: "source",
             fileName: "AdbService.js",
             line: 33
+          },
+          kind: "string"
+        }
+      }
+    }
+  }], ["getPidFromPackageName", {
+    kind: "function",
+    name: "getPidFromPackageName",
+    location: {
+      type: "source",
+      fileName: "AdbService.js",
+      line: 37
+    },
+    type: {
+      location: {
+        type: "source",
+        fileName: "AdbService.js",
+        line: 37
+      },
+      kind: "function",
+      argumentTypes: [{
+        name: "adbPath",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 38
+          },
+          kind: "named",
+          name: "NuclideUri"
+        }
+      }, {
+        name: "packageName",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 39
+          },
+          kind: "string"
+        }
+      }],
+      returnType: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 40
+        },
+        kind: "promise",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 40
+          },
+          kind: "number"
+        }
+      }
+    }
+  }], ["forwardJdwpPortToPid", {
+    kind: "function",
+    name: "forwardJdwpPortToPid",
+    location: {
+      type: "source",
+      fileName: "AdbService.js",
+      line: 44
+    },
+    type: {
+      location: {
+        type: "source",
+        fileName: "AdbService.js",
+        line: 44
+      },
+      kind: "function",
+      argumentTypes: [{
+        name: "adbPath",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 45
+          },
+          kind: "named",
+          name: "NuclideUri"
+        }
+      }, {
+        name: "tcpPort",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 46
+          },
+          kind: "number"
+        }
+      }, {
+        name: "pid",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 47
+          },
+          kind: "number"
+        }
+      }],
+      returnType: {
+        location: {
+          type: "source",
+          fileName: "AdbService.js",
+          line: 48
+        },
+        kind: "promise",
+        type: {
+          location: {
+            type: "source",
+            fileName: "AdbService.js",
+            line: 48
           },
           kind: "string"
         }

@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.findArcProjectIdAndDirectory = findArcProjectIdAndDirectory;
+exports.getCachedArcProjectIdAndDirectory = getCachedArcProjectIdAndDirectory;
 exports.getLastProjectPath = getLastProjectPath;
 
 var _lruCache;
@@ -33,6 +34,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /* global localStorage */
 
 const arcInfoCache = new (_lruCache || _load_lruCache()).default({ max: 200 });
+const arcInfoResultCache = new (_lruCache || _load_lruCache()).default({ max: 200 });
 const STORAGE_KEY = 'nuclide.last-arc-project-path';
 
 /**
@@ -49,6 +51,7 @@ function findArcProjectIdAndDirectory(src) {
       if (result != null) {
         localStorage.setItem(`${ STORAGE_KEY }.${ result.projectId }`, result.directory);
       }
+      arcInfoResultCache.set(src, result);
       return result;
     }).catch(err => {
       // Clear the cache if there's an error to enable retries.
@@ -58,6 +61,15 @@ function findArcProjectIdAndDirectory(src) {
     arcInfoCache.set(src, cached);
   }
   return cached;
+}
+
+/**
+ * A best-effort function that only works if findArcProjectIdAndDirectory
+ * has completed at some point in the past.
+ * This is actually the common case due to its ubiquity.
+ */
+function getCachedArcProjectIdAndDirectory(src) {
+  return arcInfoResultCache.get(src);
 }
 
 function getLastProjectPath(projectId) {

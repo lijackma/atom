@@ -139,7 +139,7 @@ function activate(state) {
     }, { type: 'separator' }]
   }));
 
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', '.hgrc');
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', ['.hgrc']);
 }
 
 function addItemsToFileTreeContextMenu(contextMenu) {

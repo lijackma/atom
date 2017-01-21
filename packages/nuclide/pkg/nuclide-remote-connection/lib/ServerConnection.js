@@ -75,6 +75,12 @@ function _load_nuclideVersion() {
   return _nuclideVersion = require('../../nuclide-version');
 }
 
+var _lookupPreferIpV;
+
+function _load_lookupPreferIpV() {
+  return _lookupPreferIpV = _interopRequireDefault(require('./lookup-prefer-ip-v6'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // ServerConnection represents the client side of a connection to a remote machine.
@@ -86,16 +92,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 // A ServerConnection keeps a list of RemoteConnections - one for each open directory on the remote
 // machine. Once all RemoteConnections have been closed, then the ServerConnection will close.
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- */
-
 class ServerConnection {
 
   static getOrCreate(config) {
@@ -223,7 +219,7 @@ class ServerConnection {
       // Test connection first. First time we get here we're checking to reestablish
       // connection using cached credentials. This will fail fast (faster than infoService)
       // when we don't have cached credentials yet.
-      const heartbeatVersion = yield client.getTransport().testConnection();
+      const [heartbeatVersion, ip] = yield Promise.all([client.getTransport().testConnection(), (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(_this._config.host)]);
       if (clientVersion !== heartbeatVersion) {
         throwVersionMismatch(heartbeatVersion);
       }
@@ -237,7 +233,7 @@ class ServerConnection {
       _this._monitorConnectionHeartbeat();
 
       ServerConnection._connections.set(_this.getRemoteHostname(), _this);
-      (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).setConnectionConfig)(_this._config);
+      (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).setConnectionConfig)(_this._config, ip);
       ServerConnection._emitter.emit('did-add', _this);
     })();
   }
@@ -408,7 +404,16 @@ class ServerConnection {
   }
 }
 
-exports.ServerConnection = ServerConnection;
+exports.ServerConnection = ServerConnection; /**
+                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the license found in the LICENSE file in
+                                              * the root directory of this source tree.
+                                              *
+                                              * 
+                                              */
+
 ServerConnection._connections = new Map();
 ServerConnection._emitter = new _atom.Emitter();
 const __test__ = exports.__test__ = {

@@ -32,7 +32,7 @@ function debounce(func, wait, immediate = false) {
     }
   };
 
-  return function () {
+  const debounced = function () {
     context = this;
     args = arguments;
     timestamp = Date.now();
@@ -47,6 +47,15 @@ function debounce(func, wait, immediate = false) {
 
     return result;
   };
+
+  debounced.dispose = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = context = args = null;
+    }
+  };
+
+  return debounced;
 } /**
    * Copyright (c) 2015-present, Facebook, Inc.
    * All rights reserved.

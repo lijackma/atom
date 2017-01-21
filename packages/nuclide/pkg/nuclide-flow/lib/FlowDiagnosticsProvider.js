@@ -82,7 +82,7 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
  */
 
 function extractPath(message) {
-  return message.range == null ? undefined : message.range.file;
+  return message.rangeInFile == null ? undefined : message.rangeInFile.file;
 }
 
 // A trace object is very similar to an error object.
@@ -198,8 +198,8 @@ class FlowDiagnosticsProvider {
          * own text and path.
          */
         for (const messageComponent of message.messageComponents) {
-          if (messageComponent.range != null) {
-            pathsForRoot.add(messageComponent.range.file);
+          if (messageComponent.rangeInFile != null) {
+            pathsForRoot.add(messageComponent.rangeInFile.file);
           }
         }
       }

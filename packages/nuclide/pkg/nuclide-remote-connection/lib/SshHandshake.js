@@ -183,18 +183,21 @@ class SshHandshake {
         return;
       }
 
-      const connection = yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(_this._config.host, _this._config.cwd, _this._config.displayTitle);
+      let address;
+      try {
+        address = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(config.host);
+      } catch (e) {
+        return _this._error('Failed to resolve DNS.', SshHandshake.ErrorType.HOST_NOT_FOUND, e);
+      }
+
+      const connection = (yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(_this._config.host, _this._config.cwd, _this._config.displayTitle)) || (
+      // We save connections by their IP address as well, in case a different hostname
+      // was used for the same server.
+      yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(address, _this._config.cwd, _this._config.displayTitle));
 
       if (connection) {
         _this._didConnect(connection);
         return;
-      }
-
-      let address = null;
-      try {
-        address = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(config.host);
-      } catch (e) {
-        _this._error('Failed to resolve DNS.', SshHandshake.ErrorType.HOST_NOT_FOUND, e);
       }
 
       if (config.authMethod === SupportedMethods.SSL_AGENT) {

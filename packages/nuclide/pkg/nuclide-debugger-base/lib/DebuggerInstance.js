@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.DebuggerInstance = undefined;
 
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
 var _atom = require('atom');
 
 var _UniversalDisposable;
@@ -171,9 +173,10 @@ class DebuggerInstance extends DebuggerInstanceBase {
   _handleServerMessage(message_) {
     let message = message_;
     this.getLogger().log('Recieved server message: ' + message);
+    const processedMessage = this.preProcessServerMessage(message);
     const webSocket = this._chromeWebSocket;
     if (webSocket) {
-      message = this._translateMessageIfNeeded(message);
+      message = this._translateMessageIfNeeded(processedMessage);
       webSocket.send(message);
     } else {
       this.getLogger().logError('Why isn\'t chrome websocket available?');
@@ -191,8 +194,23 @@ class DebuggerInstance extends DebuggerInstanceBase {
   }
 
   _handleChromeSocketMessage(message) {
-    this.getLogger().log('Recieved Chrome message: ' + message);
-    this._rpcService.sendCommand((0, (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageToServer)(message));
+    var _this = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      _this.getLogger().log('Recieved Chrome message: ' + message);
+      const processedMessage = yield _this.preProcessClientMessage(message);
+      _this._rpcService.sendCommand((0, (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageToServer)(processedMessage));
+    })();
+  }
+
+  // Preprocessing hook for client messsages before sending to server.
+  preProcessClientMessage(message) {
+    return Promise.resolve(message);
+  }
+
+  // Preprocessing hook for server messages before sending to client UI.
+  preProcessServerMessage(message) {
+    return message;
   }
 
   _handleChromeSocketError(error) {

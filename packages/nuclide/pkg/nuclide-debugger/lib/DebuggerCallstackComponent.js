@@ -19,6 +19,12 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
 var _ListView;
 
 function _load_ListView() {
@@ -33,20 +39,53 @@ function _load_Bridge() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 class DebuggerCallstackComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._handleCallframeClick = this._handleCallframeClick.bind(this);
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this.state = {
+      callstack: props.callstackStore.getCallstack(),
+      selectedCallFrameIndex: props.callstackStore.getSelectedCallFrameIndex()
+    };
+  }
+
+  componentDidMount() {
+    const { callstackStore } = this.props;
+    this._disposables.add(callstackStore.onChange(() => {
+      this.setState({
+        selectedCallFrameIndex: callstackStore.getSelectedCallFrameIndex(),
+        callstack: callstackStore.getCallstack()
+      });
+    }));
+  }
+
+  componentWillUnmount() {
+    this._disposables.dispose();
   }
 
   _handleCallframeClick(callFrameIndex, clickedCallframe) {
+    if (callFrameIndex === this.state.selectedCallFrameIndex) {
+      // Bail if we click the frame we're already on to prevent a re-render.
+      return;
+    }
     this.props.bridge.setSelectedCallFrameIndex(callFrameIndex);
     this.props.actions.setSelectedCallFrameIndex(callFrameIndex);
   }
 
   render() {
-    const { callstack } = this.props;
+    const { callstack } = this.state;
     const items = callstack == null ? [] : callstack.map((callstackItem, i) => {
       const {
         name,
@@ -73,7 +112,7 @@ class DebuggerCallstackComponent extends _reactForAtom.React.Component {
         )
       );
       const itemClassNames = (0, (_classnames || _load_classnames()).default)({
-        'nuclide-debugger-callstack-item-selected': this.props.selectedCallFrameIndex === i
+        'nuclide-debugger-callstack-item-selected': this.state.selectedCallFrameIndex === i
       });
       return _reactForAtom.React.createElement(
         (_ListView || _load_ListView()).ListViewItem,
@@ -98,12 +137,4 @@ class DebuggerCallstackComponent extends _reactForAtom.React.Component {
     );
   }
 }
-exports.DebuggerCallstackComponent = DebuggerCallstackComponent; /**
-                                                                  * Copyright (c) 2015-present, Facebook, Inc.
-                                                                  * All rights reserved.
-                                                                  *
-                                                                  * This source code is licensed under the license found in the LICENSE file in
-                                                                  * the root directory of this source tree.
-                                                                  *
-                                                                  * 
-                                                                  */
+exports.DebuggerCallstackComponent = DebuggerCallstackComponent;

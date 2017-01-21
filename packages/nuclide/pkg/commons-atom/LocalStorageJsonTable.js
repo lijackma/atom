@@ -13,8 +13,9 @@ function _load_observable() {
 
 class LocalStorageJsonTable {
 
-  constructor(localStorageKey) {
+  constructor(localStorageKey, cacheSize = 100) {
     this._localStorageKey = localStorageKey;
+    this._cacheSize = cacheSize;
   }
 
   _open() {
@@ -48,16 +49,16 @@ class LocalStorageJsonTable {
   setItem(key, value) {
     let db = this._open();
     const matchIndex = db.findIndex(({ key: k }) => k === key);
-    // If nothing changed, we don't have to do anything.
-    if (matchIndex !== -1 && matchIndex === db.length - 1) {
+    if (matchIndex !== -1) {
       const previousValue = db[matchIndex].value;
-      if (value === previousValue) {
+      // No reason to drop and re-push the most recent value
+      if (value === previousValue && matchIndex === db.length - 1) {
         return;
       }
+      db.splice(matchIndex, 1);
     }
-    db.splice(matchIndex, 1);
     db.push({ key, value });
-    db = db.slice(-100); // Only keep the most recent 100 entries.
+    db = db.slice(-this._cacheSize);
     localStorage.setItem(this._localStorageKey, JSON.stringify(db));
   }
 

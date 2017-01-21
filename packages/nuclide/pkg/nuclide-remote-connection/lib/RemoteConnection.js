@@ -100,10 +100,11 @@ class RemoteConnection {
    * Create a connection by reusing the configuration of last successful connection associated with
    * given host. If the server's certs has been updated or there is no previous successful
    * connection, null (resolved by promise) is returned.
+   * Configurations may also be retrieved by IP address.
    */
-  static createConnectionBySavedConfig(host, cwd, displayTitle) {
+  static createConnectionBySavedConfig(hostOrIp, cwd, displayTitle) {
     return (0, _asyncToGenerator.default)(function* () {
-      const connectionConfig = (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).getConnectionConfig)(host);
+      const connectionConfig = (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).getConnectionConfig)(hostOrIp);
       if (!connectionConfig) {
         return null;
       }
@@ -112,7 +113,7 @@ class RemoteConnection {
         return yield RemoteConnection.findOrCreate(config);
       } catch (e) {
         const log = e.name === 'VersionMismatchError' ? logger.warn : logger.error;
-        log(`Failed to reuse connectionConfiguration for ${ host }`, e);
+        log(`Failed to reuse connectionConfiguration for ${ hostOrIp }`, e);
         return null;
       }
     })();

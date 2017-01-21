@@ -53,7 +53,7 @@ let goToLocation = exports.goToLocation = (() => {
         searchAllPanes: true
       });
 
-      if (center) {
+      if (center && line != null) {
         editor.scrollToBufferPosition([line, column], { center: true });
       }
       return editor;

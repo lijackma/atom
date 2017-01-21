@@ -3,14 +3,31 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+let connectionToFlowService = (() => {
+  var _ref = (0, _asyncToGenerator.default)(function* (connection) {
+    const flowService = (0, (_FlowServiceFactory || _load_FlowServiceFactory()).getFlowServiceByConnection)(connection);
+    const fileNotifier = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
+    const languageService = yield flowService.initialize(fileNotifier);
+
+    return languageService;
+  });
+
+  return function connectionToFlowService(_x) {
+    return _ref.apply(this, arguments);
+  };
+})();
+
+/** Provider for autocomplete service. */
+
+
 exports.activate = activate;
 exports.createAutocompleteProvider = createAutocompleteProvider;
-exports.getHyperclickProvider = getHyperclickProvider;
 exports.provideBusySignal = provideBusySignal;
 exports.provideDiagnostics = provideDiagnostics;
-exports.provideOutlines = provideOutlines;
 exports.createTypeHintProvider = createTypeHintProvider;
-exports.createCoverageProvider = createCoverageProvider;
 exports.createEvaluationExpressionProvider = createEvaluationExpressionProvider;
 exports.deactivate = deactivate;
 
@@ -46,6 +63,18 @@ function _load_projects() {
   return _projects = require('../../commons-atom/projects');
 }
 
+var _nuclideOpenFiles;
+
+function _load_nuclideOpenFiles() {
+  return _nuclideOpenFiles = require('../../nuclide-open-files');
+}
+
+var _nuclideLanguageService;
+
+function _load_nuclideLanguageService() {
+  return _nuclideLanguageService = require('../../nuclide-language-service');
+}
+
 var _FlowServiceWatcher;
 
 function _load_FlowServiceWatcher() {
@@ -58,12 +87,6 @@ function _load_FlowAutocompleteProvider() {
   return _FlowAutocompleteProvider = _interopRequireDefault(require('./FlowAutocompleteProvider'));
 }
 
-var _FlowHyperclickProvider;
-
-function _load_FlowHyperclickProvider() {
-  return _FlowHyperclickProvider = _interopRequireDefault(require('./FlowHyperclickProvider'));
-}
-
 var _nuclideBusySignal;
 
 function _load_nuclideBusySignal() {
@@ -74,12 +97,6 @@ var _FlowDiagnosticsProvider;
 
 function _load_FlowDiagnosticsProvider() {
   return _FlowDiagnosticsProvider = _interopRequireDefault(require('./FlowDiagnosticsProvider'));
-}
-
-var _FlowOutlineProvider;
-
-function _load_FlowOutlineProvider() {
-  return _FlowOutlineProvider = require('./FlowOutlineProvider');
 }
 
 var _FlowTypeHintProvider;
@@ -98,12 +115,6 @@ var _FlowServiceFactory;
 
 function _load_FlowServiceFactory() {
   return _FlowServiceFactory = require('./FlowServiceFactory');
-}
-
-var _FlowCoverageProvider;
-
-function _load_FlowCoverageProvider() {
-  return _FlowCoverageProvider = require('./FlowCoverageProvider');
 }
 
 var _constants;
@@ -130,26 +141,48 @@ const diagnosticsOnFlySetting = 'nuclide-flow.diagnosticsOnFly';
 
 const PACKAGE_NAME = 'nuclide-flow';
 
+const languageServiceConfig = {
+  name: 'Flow',
+  grammars: (_constants || _load_constants()).JS_GRAMMARS,
+  outline: {
+    version: '0.0.0',
+    priority: 1,
+    analyticsEventName: 'flow.outline'
+  },
+  coverage: {
+    version: '0.0.0',
+    priority: 10,
+    analyticsEventName: 'flow.coverage'
+  },
+  definition: {
+    version: '0.0.0',
+    priority: 20,
+    definitionEventName: 'flow.get-definition',
+    definitionByIdEventName: 'flow.get-definition-by-id'
+  }
+};
+
 let busySignalProvider;
 
 let flowDiagnosticsProvider;
 
 let disposables;
 
+let flowLanguageService = null;
+
 function activate() {
   if (!disposables) {
     disposables = new _atom.CompositeDisposable();
 
-    const watcher = new (_FlowServiceWatcher || _load_FlowServiceWatcher()).FlowServiceWatcher();
-    disposables.add(watcher);
+    flowLanguageService = new (_nuclideLanguageService || _load_nuclideLanguageService()).AtomLanguageService(connectionToFlowService, languageServiceConfig);
+    flowLanguageService.activate();
 
-    disposables.add(atom.commands.add('atom-workspace', 'nuclide-flow:restart-flow-server', allowFlowServerRestart));
+    disposables.add(new (_FlowServiceWatcher || _load_FlowServiceWatcher()).FlowServiceWatcher(), atom.commands.add('atom-workspace', 'nuclide-flow:restart-flow-server', allowFlowServerRestart), flowLanguageService);
 
-    (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', '.flowconfig');
+    (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', ['.flowconfig']);
   }
 }
 
-/** Provider for autocomplete service. */
 function createAutocompleteProvider() {
   const excludeLowerPriority = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.excludeOtherAutocomplete'));
   const flowResultsFirst = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.flowAutocompleteResultsFirst'));
@@ -170,17 +203,6 @@ function createAutocompleteProvider() {
     getSuggestions(request) {
       return autocompleteProvider.getSuggestions(request);
     }
-  };
-}
-
-function getHyperclickProvider() {
-  const flowHyperclickProvider = new (_FlowHyperclickProvider || _load_FlowHyperclickProvider()).default();
-  const getSuggestionForWord = flowHyperclickProvider.getSuggestionForWord.bind(flowHyperclickProvider);
-  return {
-    wordRegExp: (_constants || _load_constants()).JAVASCRIPT_WORD_REGEX,
-    priority: 20,
-    providerName: PACKAGE_NAME,
-    getSuggestionForWord
   };
 }
 
@@ -212,16 +234,6 @@ function provideDiagnostics() {
   return flowDiagnosticsProvider;
 }
 
-function provideOutlines() {
-  const provider = new (_FlowOutlineProvider || _load_FlowOutlineProvider()).FlowOutlineProvider();
-  return {
-    grammarScopes: (_constants || _load_constants()).JS_GRAMMARS,
-    priority: 1,
-    name: 'Flow',
-    getOutline: provider.getOutline.bind(provider)
-  };
-}
-
 function createTypeHintProvider() {
   const flowTypeHintProvider = new (_FlowTypeHintProvider || _load_FlowTypeHintProvider()).FlowTypeHintProvider();
   const typeHint = flowTypeHintProvider.typeHint.bind(flowTypeHintProvider);
@@ -230,17 +242,6 @@ function createTypeHintProvider() {
     providerName: PACKAGE_NAME,
     inclusionPriority: 1,
     typeHint
-  };
-}
-
-function createCoverageProvider() {
-  return {
-    displayName: 'Flow',
-    priority: 10,
-    grammarScopes: (_constants || _load_constants()).JS_GRAMMARS,
-    getCoverage(path) {
-      return (0, (_FlowCoverageProvider || _load_FlowCoverageProvider()).getCoverage)(path);
-    }
   };
 }
 

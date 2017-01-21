@@ -61,34 +61,23 @@ function _load_AutocompleteCacher() {
   return _AutocompleteCacher = _interopRequireDefault(require('../../commons-atom/AutocompleteCacher'));
 }
 
-var _passesGK;
-
-function _load_passesGK() {
-  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
-}
-
 var _FlowServiceFactory;
 
 function _load_FlowServiceFactory() {
   return _FlowServiceFactory = require('./FlowServiceFactory');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _nuclideFlowCommon;
 
-const ID_REGEX = /^[a-zA-Z_$][0-9a-zA-Z_$]*$/; /**
-                                                * Copyright (c) 2015-present, Facebook, Inc.
-                                                * All rights reserved.
-                                                *
-                                                * This source code is licensed under the license found in the LICENSE file in
-                                                * the root directory of this source tree.
-                                                *
-                                                * 
-                                                */
+function _load_nuclideFlowCommon() {
+  return _nuclideFlowCommon = require('../../nuclide-flow-common');
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 class FlowAutocompleteProvider {
   constructor() {
-    this._cacher = new (_AutocompleteCacher || _load_AutocompleteCacher()).default({
-      getSuggestions: getSuggestionsFromFlow,
+    this._cacher = new (_AutocompleteCacher || _load_AutocompleteCacher()).default(getSuggestionsFromFlow, {
       updateResults,
       shouldFilter
     });
@@ -122,19 +111,24 @@ class FlowAutocompleteProvider {
         return null;
       }
 
-      if (yield (0, (_passesGK || _load_passesGK()).default)('nuclide_fast_autocomplete')) {
-        return _this._cacher.getSuggestions(request);
-      } else {
-        return getSuggestionsFromFlow(request);
-      }
+      return _this._cacher.getSuggestions(request);
     })();
   }
 }
 
 exports.default = FlowAutocompleteProvider; // Exported only for testing
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function shouldFilter(lastRequest, currentRequest) {
-  const prefixIsIdentifier = ID_REGEX.test(currentRequest.prefix);
+  const prefixIsIdentifier = (_nuclideFlowCommon || _load_nuclideFlowCommon()).JAVASCRIPT_WHOLE_STRING_IDENTIFIER_REGEX.test(currentRequest.prefix);
   const previousPrefixIsDot = /^\s*\.\s*$/.test(lastRequest.prefix);
   const currentPrefixIsSingleChar = currentRequest.prefix.length === 1;
   const startsWithPrevious = currentRequest.prefix.length - 1 === lastRequest.prefix.length && currentRequest.prefix.startsWith(lastRequest.prefix);
@@ -161,7 +155,7 @@ function updateResults(request, results) {
 function getReplacementPrefix(originalPrefix) {
   // Ignore prefix unless it's an identifier (this keeps us from eating leading
   // dots, colons, etc).
-  return ID_REGEX.test(originalPrefix) ? originalPrefix : '';
+  return (_nuclideFlowCommon || _load_nuclideFlowCommon()).JAVASCRIPT_WHOLE_STRING_IDENTIFIER_REGEX.test(originalPrefix) ? originalPrefix : '';
 }
 
 /**

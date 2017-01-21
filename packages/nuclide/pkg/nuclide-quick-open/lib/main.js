@@ -80,19 +80,17 @@ function _load_QuickSelectionDispatcher2() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// A reasonable heuristic that prevents us from having to measure:
-const TOPBAR_APPROX_HEIGHT = 100; /**
-                                   * Copyright (c) 2015-present, Facebook, Inc.
-                                   * All rights reserved.
-                                   *
-                                   * This source code is licensed under the license found in the LICENSE file in
-                                   * the root directory of this source tree.
-                                   *
-                                   * 
-                                   */
-
-const MODAL_MARGIN = 65;
 // Don't pre-fill search input if selection is longer than this:
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const MAX_SELECTION_LENGTH = 1000;
 const ANALYTICS_CHANGE_SELECTION_DEBOUCE = 100;
 
@@ -101,7 +99,6 @@ class Activation {
   constructor() {
     this._analyticsSessionId = null;
     this._previousFocus = null;
-    this._scrollableAreaHeightGap = MODAL_MARGIN + TOPBAR_APPROX_HEIGHT;
     this._quickOpenProviderRegistry = new (_QuickOpenProviderRegistry || _load_QuickOpenProviderRegistry()).default();
     this._quickSelectionDispatcher = new (_QuickSelectionDispatcher || _load_QuickSelectionDispatcher()).default();
     this._quickSelectionActions = new (_QuickSelectionActions || _load_QuickSelectionActions()).default(this._quickSelectionDispatcher);
@@ -116,7 +113,10 @@ class Activation {
         this._closeSearchPanel();
       }
     }));
+
     this._closeSearchPanel = this._closeSearchPanel.bind(this);
+    this._handleSelection = this._handleSelection.bind(this);
+    this._handleSelectionChanged = (0, (_debounce || _load_debounce()).default)(this._handleSelectionChanged.bind(this), ANALYTICS_CHANGE_SELECTION_DEBOUCE);
   }
 
   _handleActions(action) {
@@ -134,17 +134,8 @@ class Activation {
     if (this._searchPanel == null) {
       this._searchPanel = atom.workspace.addModalPanel({
         item: document.createElement('div'),
-        visible: false
-      });
-      const modalView = atom.views.getView(this._searchPanel);
-      // These styles are for Atom Dark, which sets a fixed width for modals.
-      Object.assign(modalView.style, {
-        marginLeft: '0',
-        maxWidth: 'none',
-        position: 'absolute',
-        width: 'auto',
-        left: `${ MODAL_MARGIN }px`,
-        right: `${ MODAL_MARGIN }px`
+        visible: false,
+        className: 'nuclide-quick-open'
       });
     }
 
@@ -155,46 +146,46 @@ class Activation {
     }
 
     const _searchComponent = _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement((_QuickSelectionComponent || _load_QuickSelectionComponent()).default, {
-      scrollableAreaHeightGap: this._scrollableAreaHeightGap,
       quickSelectionActions: this._quickSelectionActions,
       searchResultManager: this._searchResultManager,
-      onBlur: this._closeSearchPanel
+      onSelection: this._handleSelection,
+      onCancellation: this._closeSearchPanel
     }), searchPanel.getItem());
 
     if (!(_searchComponent instanceof (_QuickSelectionComponent || _load_QuickSelectionComponent()).default)) {
       throw new Error('Invariant violation: "_searchComponent instanceof QuickSelectionComponent"');
     }
 
-    if (this._searchComponent == null) {
-      _searchComponent.onSelection(selection => {
-        (0, (_goToLocation || _load_goToLocation()).goToLocation)(selection.path, selection.line, selection.column);
-        (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('quickopen-select-file', {
-          'quickopen-filepath': selection.path,
-          'quickopen-query': _searchComponent.getInputValue(),
-          // The currently open "tab".
-          'quickopen-provider': this._searchResultManager.getActiveProviderName(),
-          'quickopen-session': this._analyticsSessionId || '',
-          // Because the `provider` is usually OmniSearch, also track the original provider.
-          'quickopen-provider-source': selection.sourceProvider || ''
-        });
-        this._closeSearchPanel();
-      });
-
-      _searchComponent.onCancellation(this._closeSearchPanel);
-      _searchComponent.onSelectionChanged((0, (_debounce || _load_debounce()).default)(selection => {
-        // Only track user-initiated selection-change events.
-        if (this._analyticsSessionId != null) {
-          (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('quickopen-change-selection', {
-            'quickopen-selected-index': selection.selectedItemIndex.toString(),
-            'quickopen-selected-service': selection.selectedService,
-            'quickopen-selected-directory': selection.selectedDirectory,
-            'quickopen-session': this._analyticsSessionId
-          });
-        }
-      }, ANALYTICS_CHANGE_SELECTION_DEBOUCE));
-    }
-
     this._searchComponent = _searchComponent;
+  }
+
+  _handleSelection(selections, providerName, query) {
+    for (let i = 0; i < selections.length; i++) {
+      const selection = selections[i];
+      (0, (_goToLocation || _load_goToLocation()).goToLocation)(selection.path, selection.line, selection.column);
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('quickopen-select-file', {
+        'quickopen-filepath': selection.path,
+        'quickopen-query': query,
+        // The currently open "tab".
+        'quickopen-provider': providerName,
+        'quickopen-session': this._analyticsSessionId || '',
+        // Because the `provider` is usually OmniSearch, also track the original provider.
+        'quickopen-provider-source': selection.sourceProvider || ''
+      });
+    }
+    this._closeSearchPanel();
+  }
+
+  _handleSelectionChanged(selectionIndex, providerName, query) {
+    // Only track user-initiated selection-change events.
+    if (this._analyticsSessionId != null) {
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('quickopen-change-selection', {
+        'quickopen-selected-index': selectionIndex.selectedItemIndex.toString(),
+        'quickopen-selected-service': selectionIndex.selectedService,
+        'quickopen-selected-directory': selectionIndex.selectedDirectory,
+        'quickopen-session': this._analyticsSessionId
+      });
+    }
   }
 
   _handleActiveProviderChange(newProviderName) {

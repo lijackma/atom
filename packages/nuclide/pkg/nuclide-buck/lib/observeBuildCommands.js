@@ -7,12 +7,6 @@ exports.default = observeBuildCommands;
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _passesGK;
-
-function _load_passesGK() {
-  return _passesGK = _interopRequireDefault(require('../../commons-node/passesGK'));
-}
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
@@ -47,23 +41,22 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- */
+const CHECK_INTERVAL = 30000; /**
+                               * Copyright (c) 2015-present, Facebook, Inc.
+                               * All rights reserved.
+                               *
+                               * This source code is licensed under the license found in the LICENSE file in
+                               * the root directory of this source tree.
+                               *
+                               * 
+                               */
 
-const CHECK_INTERVAL = 30000;
 const CONFIG_KEY = 'nuclide-buck.suggestTaskRunner';
 
 function observeBuildCommands(store) {
-  return new (_UniversalDisposable || _load_UniversalDisposable()).default(_rxjsBundlesRxMinJs.Observable.fromPromise((0, (_passesGK || _load_passesGK()).default)('nuclide_buck_prompt')).filter(Boolean)
+  return new (_UniversalDisposable || _load_UniversalDisposable()).default(
   // $FlowFixMe: type symbol-observable
-  .switchMapTo(_rxjsBundlesRxMinJs.Observable.from(store)).switchMap(state => {
+  _rxjsBundlesRxMinJs.Observable.from(store).switchMap(state => {
     const { buckRoot } = state;
     if (buckRoot == null) {
       return _rxjsBundlesRxMinJs.Observable.empty();

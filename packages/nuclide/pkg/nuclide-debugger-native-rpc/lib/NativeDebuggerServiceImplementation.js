@@ -139,6 +139,16 @@ class NativeDebuggerService extends (_nuclideDebuggerCommon || _load_nuclideDebu
     return _rxjsBundlesRxMinJs.Observable.fromPromise(this._startDebugging(inferiorArguments)).publish();
   }
 
+  bootstrap(bootstrapInfo) {
+    this.getLogger().log(`bootstrap lldb: ${ JSON.stringify(bootstrapInfo) }`);
+    const inferiorArguments = {
+      lldb_bootstrap_files: bootstrapInfo.lldbBootstrapFiles,
+      basepath: bootstrapInfo.basepath ? bootstrapInfo.basepath : this._config.buckConfigRootFile,
+      lldb_python_path: this._config.lldbPythonPath
+    };
+    return _rxjsBundlesRxMinJs.Observable.fromPromise(this._startDebugging(inferiorArguments)).publish();
+  }
+
   _startDebugging(inferiorArguments) {
     var _this = this;
 

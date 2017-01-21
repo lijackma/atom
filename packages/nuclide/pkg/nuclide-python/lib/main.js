@@ -91,7 +91,7 @@ let busySignalProvider = null;
 const atomConfig = {
   name: 'Python',
   grammars: (_constants || _load_constants()).GRAMMARS,
-  outlines: {
+  outline: {
     version: '0.0.0',
     priority: 1,
     analyticsEventName: 'python.outline'

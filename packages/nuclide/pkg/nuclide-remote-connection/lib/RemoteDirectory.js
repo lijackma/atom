@@ -190,7 +190,8 @@ class RemoteDirectory {
   }
 
   getRealPathSync() {
-    throw new Error('Not implemented');
+    // Remote paths should already be resolved.
+    return this._uri;
   }
 
   getBaseName() {

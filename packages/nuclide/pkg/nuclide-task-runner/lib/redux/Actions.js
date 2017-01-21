@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.didLoadInitialPackages = didLoadInitialPackages;
+exports.didActivateInitialPackages = didActivateInitialPackages;
 exports.initializeView = initializeView;
 exports.registerTaskRunner = registerTaskRunner;
 exports.runTask = runTask;
@@ -26,7 +26,7 @@ exports.unregisterTaskRunner = unregisterTaskRunner;
  * 
  */
 
-const DID_LOAD_INITIAL_PACKAGES = exports.DID_LOAD_INITIAL_PACKAGES = 'DID_LOAD_INITIAL_PACKAGES';
+const DID_ACTIVATE_INITIAL_PACKAGES = exports.DID_ACTIVATE_INITIAL_PACKAGES = 'DID_ACTIVATE_INITIAL_PACKAGES';
 const INITIALIZE_VIEW = exports.INITIALIZE_VIEW = 'INITIALIZE_VIEW';
 const REGISTER_TASK_RUNNER = exports.REGISTER_TASK_RUNNER = 'REGISTER_TASK_RUNNER';
 const RUN_TASK = exports.RUN_TASK = 'RUN_TASK';
@@ -45,8 +45,8 @@ const TASK_ERRORED = exports.TASK_ERRORED = 'TASK_ERRORED';
 const TOGGLE_TOOLBAR_VISIBILITY = exports.TOGGLE_TOOLBAR_VISIBILITY = 'TOGGLE_TOOLBAR_VISIBILITY';
 const UNREGISTER_TASK_RUNNER = exports.UNREGISTER_TASK_RUNNER = 'UNREGISTER_TASK_RUNNER';
 
-function didLoadInitialPackages() {
-  return { type: DID_LOAD_INITIAL_PACKAGES };
+function didActivateInitialPackages() {
+  return { type: DID_ACTIVATE_INITIAL_PACKAGES };
 }
 
 function initializeView(visible) {

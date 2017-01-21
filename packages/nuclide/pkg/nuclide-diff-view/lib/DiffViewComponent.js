@@ -211,7 +211,7 @@ function renderFileChanges(diffModel) {
 
   return _reactForAtom.React.createElement(
     'div',
-    null,
+    { className: 'nuclide-diff-view-tree' },
     _reactForAtom.React.createElement(
       'div',
       { className: 'padded' },
@@ -220,7 +220,7 @@ function renderFileChanges(diffModel) {
     ),
     _reactForAtom.React.createElement(
       'div',
-      { className: 'nuclide-diff-view-tree' },
+      null,
       _reactForAtom.React.createElement((_MultiRootChangedFilesView || _load_MultiRootChangedFilesView()).MultiRootChangedFilesView, {
         commandPrefix: 'nuclide-diff-view',
         fileChanges: (0, (_vcs || _load_vcs()).getMultiRootFileChanges)(selectedFiles, rootPaths),

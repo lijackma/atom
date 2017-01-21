@@ -4,9 +4,9 @@
 
 [
   {
-    type: "url"
+    type: "button"
     icon: "octoface"
-    url: "https://github.com/bierma"
+    callback: ["open-on-github:file"]
     tooltip: "Github 主页"
     style:
       color: "#FA4F28"

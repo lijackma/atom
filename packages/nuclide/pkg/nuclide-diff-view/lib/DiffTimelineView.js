@@ -6,6 +6,18 @@ Object.defineProperty(exports, "__esModule", {
 
 var _atom = require('atom');
 
+var _utils;
+
+function _load_utils() {
+  return _utils = require('./utils');
+}
+
+var _nuclideHgRpc;
+
+function _load_nuclideHgRpc() {
+  return _nuclideHgRpc = require('../../nuclide-hg-rpc');
+}
+
 var _reactForAtom = require('react-for-atom');
 
 var _RevisionTimelineNode;
@@ -108,6 +120,15 @@ function RevisionsTimelineComponent(props) {
   const latestToOldestRevisions = revisions.slice().reverse();
   const selectedIndex = latestToOldestRevisions.findIndex(revision => revision.id === compareRevisionId);
 
+  const headRevision = (0, (_utils || _load_utils()).getHeadRevision)(revisions);
+  const { CommitPhase } = (_nuclideHgRpc || _load_nuclideHgRpc()).hgConstants;
+  const canPublish = headRevision != null && headRevision.phase === CommitPhase.DRAFT;
+  const publishTooltip = {
+    delay: 100,
+    placement: 'top',
+    title: 'Publish your last commit to a Phabricator differential revision.'
+  };
+
   return _reactForAtom.React.createElement(
     'div',
     { className: 'revision-timeline-wrap' },
@@ -115,7 +136,9 @@ function RevisionsTimelineComponent(props) {
       (_Button || _load_Button()).Button,
       {
         className: 'pull-right',
+        disabled: !canPublish,
         size: (_Button || _load_Button()).ButtonSizes.SMALL,
+        tooltip: publishTooltip,
         onClick: props.onClickPublish },
       'Publish to Phabricator'
     ),

@@ -340,7 +340,7 @@ class TestRunnerController {
       // track.
       progressValue = 100;
     }
-
+    this._root.style.display = 'flex';
     const component = _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement((_TestRunnerPanel || _load_TestRunnerPanel()).default, {
       attachDebuggerBeforeRunning: this._attachDebuggerBeforeRunning,
       buffer: this._buffer,

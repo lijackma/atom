@@ -100,16 +100,18 @@ class PanelComponent extends _reactForAtom.React.Component {
     }
 
     let containerStyle;
-    if (this.props.dock === 'left' || this.props.dock === 'right') {
-      containerStyle = {
-        width: this.state.length,
-        minWidth: MINIMUM_LENGTH
-      };
-    } else if (this.props.dock === 'top' || this.props.dock === 'bottom') {
-      containerStyle = {
-        height: this.state.length,
-        minHeight: MINIMUM_LENGTH
-      };
+    if (this.props.doNotSetSize !== true) {
+      if (this.props.dock === 'left' || this.props.dock === 'right') {
+        containerStyle = {
+          width: this.state.length,
+          minWidth: MINIMUM_LENGTH
+        };
+      } else if (this.props.dock === 'top' || this.props.dock === 'bottom') {
+        containerStyle = {
+          height: this.state.length,
+          minHeight: MINIMUM_LENGTH
+        };
+      }
     }
 
     const content = _reactForAtom.React.cloneElement(_reactForAtom.React.Children.only(this.props.children), { ref: 'child' });

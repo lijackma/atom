@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getFlowServiceByNuclideUri = getFlowServiceByNuclideUri;
+exports.getFlowServiceByConnection = getFlowServiceByConnection;
 exports.getLocalFlowService = getLocalFlowService;
 exports.getServerStatusUpdates = getServerStatusUpdates;
 exports.getCurrentServiceInstances = getCurrentServiceInstances;
@@ -16,31 +17,45 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
-const FLOW_SERVICE = 'FlowService'; /**
-                                     * Copyright (c) 2015-present, Facebook, Inc.
-                                     * All rights reserved.
-                                     *
-                                     * This source code is licensed under the license found in the LICENSE file in
-                                     * the root directory of this source tree.
-                                     *
-                                     * 
-                                     */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const FLOW_SERVICE = 'FlowService';
 
 const serverStatusUpdates = new _rxjsBundlesRxMinJs.Subject();
 
 const serviceInstances = new Set();
 
 function getFlowServiceByNuclideUri(file) {
-  return getFlowServiceByNullableUri(file);
+  return getFlowServiceByUriOrConnection({ kind: 'uri', uri: file });
+}
+
+function getFlowServiceByConnection(connection) {
+  return getFlowServiceByUriOrConnection({ kind: 'connection', connection });
 }
 
 function getLocalFlowService() {
-  return getFlowServiceByNullableUri(null);
+  return getFlowServiceByUriOrConnection({ kind: 'uri', uri: null });
 }
 
 /** Returns the FlowService for the given URI, or the local FlowService if the given URI is null. */
-function getFlowServiceByNullableUri(file) {
-  const flowService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)(FLOW_SERVICE, file);
+function getFlowServiceByUriOrConnection(uriOrConnection) {
+  let flowService;
+  switch (uriOrConnection.kind) {
+    case 'uri':
+      flowService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)(FLOW_SERVICE, uriOrConnection.uri);
+      break;
+    case 'connection':
+      flowService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)(FLOW_SERVICE, uriOrConnection.connection);
+      break;
+  }
 
   if (!(flowService != null)) {
     throw new Error('Invariant violation: "flowService != null"');

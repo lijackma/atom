@@ -94,6 +94,8 @@ const GLOBAL_KEY = 'global';
 class SearchResultManager {
 
   constructor(quickOpenProviderRegistry) {
+    this._activeProviderName = OMNISEARCH_PROVIDER.name;
+    this._lastRawQuery = null;
     this._providersByDirectory = new Map();
     this._providerSubscriptions = new Map();
     this._directories = [];
@@ -105,14 +107,13 @@ class SearchResultManager {
     // `updateDirectories` joins providers and directories, which don't know anything about each
     // other. Debounce this call to reduce churn at startup, and when new providers get activated or
     // a new directory gets mounted.
-    this._debouncedUpdateDirectories = (0, (_debounce || _load_debounce()).default)(() => this._updateDirectories(), UPDATE_DIRECTORIES_DEBOUNCE_DELAY,
+    this._debouncedUpdateDirectories = (0, (_debounce || _load_debounce()).default)(this._updateDirectories.bind(this), UPDATE_DIRECTORIES_DEBOUNCE_DELAY,
     /* immediate */false);
     this._emitter = new _atom.Emitter();
     this._subscriptions = new _atom.CompositeDisposable();
     this._quickOpenProviderRegistry = quickOpenProviderRegistry;
-    this._subscriptions.add(atom.project.onDidChangePaths(this._debouncedUpdateDirectories.bind(this)), this._quickOpenProviderRegistry.observeProviders(this._registerProvider.bind(this)), this._quickOpenProviderRegistry.onDidRemoveProvider(this._deregisterProvider.bind(this)));
+    this._subscriptions.add(atom.project.onDidChangePaths(this._debouncedUpdateDirectories), this._quickOpenProviderRegistry.observeProviders(this._registerProvider.bind(this)), this._quickOpenProviderRegistry.onDidRemoveProvider(this._deregisterProvider.bind(this)));
     this._debouncedUpdateDirectories();
-    this._activeProviderName = OMNISEARCH_PROVIDER.name;
   }
 
   executeQuery(query) {
@@ -136,6 +137,10 @@ class SearchResultManager {
 
   getActiveProviderName() {
     return this._activeProviderName;
+  }
+
+  getLastQuery() {
+    return this._lastRawQuery;
   }
 
   getRendererForProvider(providerName) {
@@ -286,6 +291,7 @@ class SearchResultManager {
   }
 
   _executeQuery(rawQuery) {
+    this._lastRawQuery = rawQuery;
     const query = this._sanitizeQuery(rawQuery);
     for (const globalProvider of this._quickOpenProviderRegistry.getGlobalProviders()) {
       const startTime = performance.now();
@@ -421,9 +427,14 @@ class SearchResultManager {
 
   getRenderableProviders() {
     // Only render tabs for providers that are eligible for at least one directory.
-    const eligibleDirectoryProviders =
-    // $FlowIssue
-    Array.from(new Set(...this._providersByDirectory.values()));
+    const eligibleDirectoryProviders = this._quickOpenProviderRegistry.getDirectoryProviders().filter(eligibleProvider => {
+      for (const [, directoryProviders] of this._providersByDirectory) {
+        if (directoryProviders.has(eligibleProvider)) {
+          return true;
+        }
+      }
+      return false;
+    });
     const tabs = this._quickOpenProviderRegistry.getGlobalProviders().concat(eligibleDirectoryProviders).filter(provider => provider.display != null).map(provider => this._bakeProvider(provider)).sort((p1, p2) => p1.name.localeCompare(p2.name));
     tabs.unshift(OMNISEARCH_PROVIDER);
     return tabs;

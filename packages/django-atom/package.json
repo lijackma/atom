@@ -1,0 +1,60 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+        "spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+        "type": "local"
+      },
+      "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/apm-install-dir-117018-87940-17lpxaf"
+    ]
+  ],
+  "_from": "../d-117018-87940-1d9w9s7/package.tgz",
+  "_id": "django-atom@0.2.4",
+  "_inCache": true,
+  "_installable": true,
+  "_location": "/django-atom",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+    "spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+    "type": "local"
+  },
+  "_requiredBy": [
+    "#USER"
+  ],
+  "_resolved": "file:../d-117018-87940-1d9w9s7/package.tgz",
+  "_shasum": "6719ae94fc158cad9fa2dc109875d301c10b2a0b",
+  "_shrinkwrap": null,
+  "_spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117018-87940-1d9w9s7/package.tgz",
+  "_where": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/apm-install-dir-117018-87940-17lpxaf",
+  "bugs": {
+    "url": "https://github.com/MauricioDinki/django-atom/issues"
+  },
+  "dependencies": {},
+  "description": "Django Support for Atom",
+  "devDependencies": {},
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "homepage": "https://github.com/MauricioDinki/django-atom#readme",
+  "keywords": [],
+  "license": "MIT",
+  "name": "django-atom",
+  "optionalDependencies": {},
+  "readme": "# Django Support for Atom\n\n## Install\n\n```bash\n$ apm install django-atom\n```\n## Release Notes\n### 0.1.0\n\n* Initial build of Django for Atom from the superb [Django TextMate bundle](https://github.com/textmate/python-django.tmbundle)\n\n### 0.2.0\n\n* Support for django forms\n* Snippets for class based views\n\n### 0.2.2\n\n* Fixed bug in django shortcuts color syntax\n* Color syntax in settings constants\n\n### 0.2.3\n\n* Color syntax in html templates\n\n### 0.2.4\n\n* Fixed bugs in template syntax color\n* Working with Skeletons is easier\n* Add utils Snippets\n\n#### Django Template Snippets\n\nAbbreviation | Tag\n------------ | -------------------------------------------------\nautoescape   |  ``{% autoescape %} {% autoescape %}``\nblock        |  ``{% block %} {% endblock %}``\nblocktrans\t |\t``{% blocktrans with as %} {% endblocktrans %}``\ncomment      |  ``{% comment %} {% endcomment %}``\ncsrf         |  ``{% csrf_token %}``\ncycle        |  ``{% cycle as %}``\ndebug        |  ``{% debug %}``\nelse         |  ``{% else %}``\nempty        |  ``{% empty %}``\nextends      |  ``{% extends \"\" %}``\nfilter       |  ``{% filter %} {% endfilter %}``\nfirstof      |  ``{% firstof %}``\nfor          |  ``{% for in %} {% endfor %}``\nfore         |  ``{% for in %} {% empty %} {% endfor %}``\nif           |  ``{% if %} {% endif %}``\nifchanged    |  ``{% ifchanged %} {% endifchanged %}``\nife          |  ``{% if %} {% else %} {% endif %}``\nifelse       |  ``{% if %} {% else %} {% endif %}``\nifeq         |  ``{% ifequal %} {% endifequal %}``\nifequal      |  ``{% ifequal %} {% endifequal %}``\nifnotequal   |  ``{% ifnotequal %} {% endifnotequal %}``\ninclude      |  ``{% include %}``\nload         |  ``{% load %}``\nnow          |  ``{% now \"\" %}``\nregroup      |  ``{% regroup by as %}``\nspaceless    |  ``{% spaceless %} {% endspaceless %}``\nssi          |  ``{% ssi %}``\nstatic       |  ``{% static %}``\nsuper        |  ``{% block.super %}``\ntemplatetag  |  ``{% templatetag %}``\ntrans        |  ``{% trans %}``\nurl          |  ``{% url %}``\nverbatim     |  ``{% verbatim %} {% endverbatim %}``\nwidthratio   |  ``{% widthratio %}``\nwith         |  ``{% with as %} {% endwith %}``\n\n#### Model fields Snippets\n\nAbbreviation | Tag\n------------ | ---------------------------------------\nmauto        | ``models.AutoField()``\nmbigint      | ``models.BigIntegerField()``\nmbool        | ``models.BooleanField()``\nmchar        | ``models.CharField()``\nmcoseint     | ``models.CommaSeparatedIntegerField()``\nmdate        | ``models.DateField()``\nmdatetime    | ``models.DateTimeField()``\nmdecimal     | ``models.DecimalField()``\nmemail       | ``models.EmailField()``\nmfile        | ``models.FileField()``\nmfilepath    | ``models.FilePathField()``\nmfloat       | ``models.FloatField()``\nmimg         | ``models.ImageField()``\nmint         | ``models.IntegerField()``\nmip          | ``models.IPAddressField()``\nmnullbool    | ``models.NullBooleanField()``\nmphone       | ``models.PhoneNumberField()``\nmposint      | ``models.PositiveIntegerField()``\nmpossmallin  | ``models.PositiveSmallIntegerField()``\nmslug        | ``models.SlugField()``\nmsmallint    | ``models.SmallIntegerFiled()``\nmtext        | ``models.TextField()``\nmtime        | ``models.TimeField()``\nmurl         | ``models.URLField()``\nmusstate     | ``models.USStateField()``\nmxml         | ``models.XMLField()``\nfk           | ``models.ForeignKey()``\nm2m          | ``models.ManyToManyField()``\no2o          | ``models.OneToOneField()``\n\n#### Form fields Snippets\n\nAbbreviation | Tag\n------------ | --------------------------------------\nfchar        | ``forms.CharField()``\nfchoice      | ``forms.ChoiceField()``\nfcombo       | ``forms.ComboField()``\nfdate        | ``forms.DateField()``\nfdatetime    | ``forms.DateTime()``\nfdecimal     | ``forms.DecimalField()``\nfemail       | ``forms.EmailField()``\nffile        | ``forms.FileField()``\nffilepath    | ``forms.FilePathField()``\nffloat       | ``forms.FloatField()``\nfimg         | ``forms.ImageField()``\nfint         | ``forms.IntegerField()``\nfip          | ``forms.IPAddressField()``\nfmochoice    | ``forms.ModelChoiceField()``\nfmomuchoice  | ``forms.ModelMultipleChoiceField()``\nfmuchoice    | ``forms.MultipleChoiceField()``\nfmuval       | ``forms.MultipleValueField()``\nfnullbool    | ``forms.NullBooleanField()``\nfregex       | ``forms.RegexField()``\nfslug        | ``forms.SlugField()``\nfsdatetime   | ``forms.SplitDateTime()``\nftime        | ``forms.TimeField()``\nftchoice     | ``forms.TypedChoiceField()``\nftmuchoice   | ``forms.TypedMultipleChoiceField()``\nfurl         | ``forms.URLField()``\n\n#### Skeleton Snippets\n\nAbbreviation | Content\n------------ | --------------------------------------\nform         | ``Form Skeleton``\nfview        | ``Function View Skeleton``\nmodel        | ``Model Skeleton``\nmodelform    | ``ModelForm Skeleton``\n\n#### Class Based Views Snippets\n\nAbbreviation | Content\n------------ | --------------------------------------\ncreateview   | ``CreateView Skeleton``\ndeleteview   | ``DeleteView View Skeleton``\ndetailview   | ``DetailView Skeleton``\nlistview     | ``ListView Skeleton``\ntemplateview | ``TemplateView Skeleton``\nupdateview   | ``UpdateView Skeleton``\ncbview       | ``Class Based View Skeleton``\n\n#### Util Snippets\n\nAbbreviation | Content\n------------ | --------------------------------------\n__init__     | ``__init__(self, *args, **kwargs)``\nipdb         | ``ipdb.set_trace()``\npdb          | ``pdb.set_trace()``\nsendmail     | ``mail.send_mail()``\ntraceback    | ``TemplateView Skeleton``\nupdateview   | ``traceback.print_exc()``\nurl          | ``URL structure``\nvar          | ``{{  }}``\n\n\n## License\n\nMIT © [Mauricio Ivan](https://github.com/mauriciodinki)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MauricioDinki/django-atom.git"
+  },
+  "version": "0.2.4"
+}

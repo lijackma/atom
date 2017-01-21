@@ -60,7 +60,7 @@ class Activation {
   constructor(state) {
     this._disposables = new _atom.CompositeDisposable();
     this._busySignalProvider = new (_nuclideBusySignal || _load_nuclideBusySignal()).DedupedBusySignalProviderBase();
-    (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', '.arcconfig');
+    (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', ['.arcconfig']);
   }
 
   dispose() {

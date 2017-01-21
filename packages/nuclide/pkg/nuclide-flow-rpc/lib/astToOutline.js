@@ -5,6 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.astToOutline = astToOutline;
 
+var _simpleTextBuffer;
+
+function _load_simpleTextBuffer() {
+  return _simpleTextBuffer = require('simple-text-buffer');
+}
+
 var _collection;
 
 function _load_collection() {
@@ -17,17 +23,21 @@ function _load_tokenizedText() {
   return _tokenizedText = require('../../commons-node/tokenizedText');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function astToOutline(ast) {
-  return itemsToTrees(ast.body);
-} /**
-   * Copyright (c) 2015-present, Facebook, Inc.
-   * All rights reserved.
-   *
-   * This source code is licensed under the license found in the LICENSE file in
-   * the root directory of this source tree.
-   *
-   * 
-   */
+  return {
+    outlineTrees: itemsToTrees(ast.body)
+  };
+}
 
 function itemsToTrees(items) {
   return (0, (_collection || _load_collection()).arrayCompact)(items.map(itemToTree));
@@ -95,6 +105,12 @@ function exportDeclaration(item, extent, isDefault) {
   if (isDefault) {
     tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).keyword)('default'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '));
   }
+  // Flow always has tokenizedText
+
+  if (!(tree.tokenizedText != null)) {
+    throw new Error('Invariant violation: "tree.tokenizedText != null"');
+  }
+
   tokenizedText.push(...tree.tokenizedText);
   return Object.assign({
     tokenizedText,
@@ -139,16 +155,11 @@ function declarationsTokenizedText(declarations) {
 
 function getExtent(item) {
   return {
-    startPosition: {
-      // It definitely makes sense that the lines we get are 1-based and the columns are
-      // 0-based... convert to 0-based all around.
-      line: item.loc.start.line - 1,
-      column: item.loc.start.column
-    },
-    endPosition: {
-      line: item.loc.end.line - 1,
-      column: item.loc.end.column
-    }
+    startPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(
+    // It definitely makes sense that the lines we get are 1-based and the columns are
+    // 0-based... convert to 0-based all around.
+    item.loc.start.line - 1, item.loc.start.column),
+    endPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(item.loc.end.line - 1, item.loc.end.column)
   };
 }
 

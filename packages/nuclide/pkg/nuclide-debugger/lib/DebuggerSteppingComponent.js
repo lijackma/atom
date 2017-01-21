@@ -37,6 +37,12 @@ function _load_DebuggerStore() {
   return _DebuggerStore = require('./DebuggerStore');
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
@@ -98,18 +104,46 @@ class DebuggerSteppingComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    const { debuggerStore } = props;
+    this.state = {
+      allowSingleThreadStepping: Boolean(debuggerStore.getSettings().get('SingleThreadStepping')),
+      debuggerMode: debuggerStore.getDebuggerMode(),
+      pauseOnException: debuggerStore.getTogglePauseOnException(),
+      pauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
+      enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
+      customControlButtons: debuggerStore.getCustomControlButtons()
+    };
+  }
+
+  componentDidMount() {
+    const { debuggerStore } = this.props;
+    this._disposables.add(debuggerStore.onChange(() => {
+      this.setState({
+        allowSingleThreadStepping: Boolean(debuggerStore.getSettings().get('SingleThreadStepping')),
+        debuggerMode: debuggerStore.getDebuggerMode(),
+        pauseOnException: debuggerStore.getTogglePauseOnException(),
+        pauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
+        enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
+        customControlButtons: debuggerStore.getCustomControlButtons()
+      });
+    }));
+  }
+
+  componentWillUnmount() {
+    this._disposables.dispose();
   }
 
   render() {
     const {
-      actions,
       debuggerMode,
       pauseOnException,
       pauseOnCaughtException,
       allowSingleThreadStepping,
-      singleThreadStepping,
+      enableSingleThreadStepping,
       customControlButtons
-    } = this.props;
+    } = this.state;
+    const { actions } = this.props;
     const isPaused = debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.PAUSED;
     return _reactForAtom.React.createElement(
       'div',
@@ -197,8 +231,8 @@ class DebuggerSteppingComponent extends _reactForAtom.React.Component {
       )] : null,
       allowSingleThreadStepping ? _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
         className: 'nuclide-debugger-exception-checkbox',
-        onChange: () => actions.toggleSingleThreadStepping(!singleThreadStepping),
-        checked: singleThreadStepping,
+        onChange: () => actions.toggleSingleThreadStepping(!enableSingleThreadStepping),
+        checked: enableSingleThreadStepping,
         label: 'Single Thread Stepping'
       }) : null
     );

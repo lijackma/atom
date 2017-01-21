@@ -20,7 +20,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 class AutocompleteCacher {
 
-  constructor(config) {
+  constructor(getSuggestions, config) {
+    this._getSuggestions = getSuggestions;
     this._config = config;
   }
 
@@ -34,7 +35,7 @@ class AutocompleteCacher {
       };
       return result;
     } else {
-      const result = this._config.getSuggestions(request);
+      const result = this._getSuggestions(request);
       this._session = {
         firstResult: result,
         lastRequest: request

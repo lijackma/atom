@@ -77,8 +77,8 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function aggregateTaskListsEpic(actions, store, options) {
-  // Wait until the initial packages have loaded.
-  return actions.ofType((_Actions || _load_Actions()).DID_LOAD_INITIAL_PACKAGES).switchMap(() => {
+  // Wait until the initial packages have activated.
+  return actions.ofType((_Actions || _load_Actions()).DID_ACTIVATE_INITIAL_PACKAGES).switchMap(() => {
     // We pass the state stream explicitly. Ideally, we'd just use `Observable.from(store)`,
     // but Redux gives us a partial store so we have to work around it.
     // See redux-observable/redux-observable#56

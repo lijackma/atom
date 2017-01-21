@@ -828,15 +828,17 @@ class HgRepositoryClient {
   }
 
   commit(message) {
-    return this._service.commit(message).refCount().do({
-      complete: this._clearClientCache.bind(this)
-    });
+    return this._service.commit(message).refCount().do(this._clearOnSuccessExit.bind(this));
   }
 
   amend(message, amendMode) {
-    return this._service.amend(message, amendMode).refCount().do({
-      complete: this._clearClientCache.bind(this)
-    });
+    return this._service.amend(message, amendMode).refCount().do(this._clearOnSuccessExit.bind(this));
+  }
+
+  _clearOnSuccessExit(message) {
+    if (message.kind === 'exit' && message.exitCode === 0) {
+      this._clearClientCache();
+    }
   }
 
   revert(filePaths, toRevision) {

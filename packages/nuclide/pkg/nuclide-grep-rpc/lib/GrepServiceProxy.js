@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 31
+          line: 42
         },
         kind: "named",
         name: "NuclideUri"
@@ -23,7 +23,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 32
+          line: 43
         },
         kind: "named",
         name: "RegExp"
@@ -34,14 +34,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 33
+          line: 44
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 33
+            line: 44
           },
           kind: "string"
         }
@@ -53,10 +53,84 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 34
+          line: 45
         },
         kind: "named",
         name: "search$FileResult"
+      });
+    }).publish();
+  };
+
+  remoteModule.grepReplace = function (arg0, arg1, arg2, arg3) {
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "filePaths",
+      type: {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 53
+        },
+        kind: "array",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 53
+          },
+          kind: "named",
+          name: "NuclideUri"
+        }
+      }
+    }, {
+      name: "regex",
+      type: {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 54
+        },
+        kind: "named",
+        name: "RegExp"
+      }
+    }, {
+      name: "replacementText",
+      type: {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 55
+        },
+        kind: "string"
+      }
+    }, {
+      name: "concurrency",
+      type: {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 56
+        },
+        kind: "nullable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 56
+          },
+          kind: "number"
+        }
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("GrepService/grepReplace", "observable", args);
+    })).concatMap(id => id).concatMap(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 57
+        },
+        kind: "named",
+        name: "search$ReplaceResult"
       });
     }).publish();
   };
@@ -123,46 +197,30 @@ Object.defineProperty(module.exports, "defs", {
     location: {
       type: "source",
       fileName: "GrepService.js",
-      line: 18
+      line: 19
     },
     name: "search$Match",
     definition: {
       location: {
         type: "source",
         fileName: "GrepService.js",
-        line: 18
+        line: 19
       },
       kind: "object",
       fields: [{
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 19
+          line: 20
         },
         name: "lineText",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 19
-          },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "GrepService.js",
-          line: 20
-        },
-        name: "lineTextOffset",
-        type: {
-          location: {
-            type: "source",
-            fileName: "GrepService.js",
             line: 20
           },
-          kind: "number"
+          kind: "string"
         },
         optional: false
       }, {
@@ -171,14 +229,14 @@ Object.defineProperty(module.exports, "defs", {
           fileName: "GrepService.js",
           line: 21
         },
-        name: "matchText",
+        name: "lineTextOffset",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
             line: 21
           },
-          kind: "string"
+          kind: "number"
         },
         optional: false
       }, {
@@ -187,26 +245,42 @@ Object.defineProperty(module.exports, "defs", {
           fileName: "GrepService.js",
           line: 22
         },
-        name: "range",
+        name: "matchText",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
             line: 22
           },
+          kind: "string"
+        },
+        optional: false
+      }, {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 23
+        },
+        name: "range",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 23
+          },
           kind: "array",
           type: {
             location: {
               type: "source",
               fileName: "GrepService.js",
-              line: 22
+              line: 23
             },
             kind: "array",
             type: {
               location: {
                 type: "source",
                 fileName: "GrepService.js",
-                line: 22
+                line: 23
               },
               kind: "number"
             }
@@ -220,28 +294,28 @@ Object.defineProperty(module.exports, "defs", {
     location: {
       type: "source",
       fileName: "GrepService.js",
-      line: 25
+      line: 26
     },
     name: "search$FileResult",
     definition: {
       location: {
         type: "source",
         fileName: "GrepService.js",
-        line: 25
+        line: 26
       },
       kind: "object",
       fields: [{
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 26
+          line: 27
         },
         name: "filePath",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 26
+            line: 27
           },
           kind: "named",
           name: "NuclideUri"
@@ -251,21 +325,21 @@ Object.defineProperty(module.exports, "defs", {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 27
+          line: 28
         },
         name: "matches",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 27
+            line: 28
           },
           kind: "array",
           type: {
             location: {
               type: "source",
               fileName: "GrepService.js",
-              line: 27
+              line: 28
             },
             kind: "named",
             name: "search$Match"
@@ -274,19 +348,153 @@ Object.defineProperty(module.exports, "defs", {
         optional: false
       }]
     }
+  }], ["search$ReplaceResult", {
+    kind: "alias",
+    location: {
+      type: "source",
+      fileName: "GrepService.js",
+      line: 31
+    },
+    name: "search$ReplaceResult",
+    definition: {
+      location: {
+        type: "source",
+        fileName: "GrepService.js",
+        line: 31
+      },
+      kind: "union",
+      types: [{
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 31
+        },
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 32
+          },
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 32
+            },
+            kind: "string-literal",
+            value: "success"
+          },
+          optional: false
+        }, {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 33
+          },
+          name: "filePath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 33
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 34
+          },
+          name: "replacements",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 34
+            },
+            kind: "number"
+          },
+          optional: false
+        }]
+      }, {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 35
+        },
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 36
+          },
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 36
+            },
+            kind: "string-literal",
+            value: "error"
+          },
+          optional: false
+        }, {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 37
+          },
+          name: "filePath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 37
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 38
+          },
+          name: "message",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 38
+            },
+            kind: "string"
+          },
+          optional: false
+        }]
+      }],
+      discriminantField: "type"
+    }
   }], ["grepSearch", {
     kind: "function",
     name: "grepSearch",
     location: {
       type: "source",
       fileName: "GrepService.js",
-      line: 30
+      line: 41
     },
     type: {
       location: {
         type: "source",
         fileName: "GrepService.js",
-        line: 30
+        line: 41
       },
       kind: "function",
       argumentTypes: [{
@@ -295,7 +503,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 31
+            line: 42
           },
           kind: "named",
           name: "NuclideUri"
@@ -306,7 +514,7 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 32
+            line: 43
           },
           kind: "named",
           name: "RegExp"
@@ -317,14 +525,14 @@ Object.defineProperty(module.exports, "defs", {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 33
+            line: 44
           },
           kind: "array",
           type: {
             location: {
               type: "source",
               fileName: "GrepService.js",
-              line: 33
+              line: 44
             },
             kind: "string"
           }
@@ -334,17 +542,109 @@ Object.defineProperty(module.exports, "defs", {
         location: {
           type: "source",
           fileName: "GrepService.js",
-          line: 34
+          line: 45
         },
         kind: "observable",
         type: {
           location: {
             type: "source",
             fileName: "GrepService.js",
-            line: 34
+            line: 45
           },
           kind: "named",
           name: "search$FileResult"
+        }
+      }
+    }
+  }], ["grepReplace", {
+    kind: "function",
+    name: "grepReplace",
+    location: {
+      type: "source",
+      fileName: "GrepService.js",
+      line: 52
+    },
+    type: {
+      location: {
+        type: "source",
+        fileName: "GrepService.js",
+        line: 52
+      },
+      kind: "function",
+      argumentTypes: [{
+        name: "filePaths",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 53
+          },
+          kind: "array",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 53
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }
+      }, {
+        name: "regex",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 54
+          },
+          kind: "named",
+          name: "RegExp"
+        }
+      }, {
+        name: "replacementText",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 55
+          },
+          kind: "string"
+        }
+      }, {
+        name: "concurrency",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 56
+          },
+          kind: "nullable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "GrepService.js",
+              line: 56
+            },
+            kind: "number"
+          }
+        }
+      }],
+      returnType: {
+        location: {
+          type: "source",
+          fileName: "GrepService.js",
+          line: 57
+        },
+        kind: "observable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "GrepService.js",
+            line: 57
+          },
+          kind: "named",
+          name: "search$ReplaceResult"
         }
       }
     }

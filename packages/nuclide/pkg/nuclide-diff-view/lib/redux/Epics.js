@@ -68,6 +68,12 @@ function _load_utils2() {
   return _utils2 = require('../../../nuclide-arcanist-rpc/lib/utils');
 }
 
+var _nuclideHgRpc;
+
+function _load_nuclideHgRpc() {
+  return _nuclideHgRpc = require('../../../nuclide-hg-rpc');
+}
+
 var _notifications;
 
 function _load_notifications() {
@@ -102,17 +108,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- */
+const CHANGE_DEBOUNCE_DELAY_MS = 300; /**
+                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                       * All rights reserved.
+                                       *
+                                       * This source code is licensed under the license found in the LICENSE file in
+                                       * the root directory of this source tree.
+                                       *
+                                       * 
+                                       */
 
-const CHANGE_DEBOUNCE_DELAY_MS = 300;
 const SHOW_CONSOLE_ON_PROCESS_EVENTS = ['stdout', 'stderr', 'error'];
 
 function trackComplete(eventName, operation) {
@@ -417,13 +422,15 @@ function setViewModeEpic(actions, store) {
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
 
-      const headCommitMessageChanges = observeRepositoryHeadRevision(activeRepository).filter(headRevision => headRevision != null).map(headRevision => {
+      const headRevisionChanges = observeRepositoryHeadRevision(activeRepository).filter(headRevision => headRevision != null).map(headRevision => {
         if (!(headRevision != null)) {
           throw new Error('Invariant violation: "headRevision != null"');
         }
 
-        return headRevision.description;
+        return headRevision;
       }).distinctUntilChanged();
+
+      const headCommitMessageChanges = headRevisionChanges.map(headRevision => headRevision.description).distinctUntilChanged();
 
       if (viewMode === (_constants || _load_constants()).DiffMode.COMMIT_MODE) {
         const commitModeChanges = _rxjsBundlesRxMinJs.Observable.of(store.getState().commit.mode).concat(actions.ofType((_ActionTypes || _load_ActionTypes()).SET_COMMIT_MODE).map(a => {
@@ -469,6 +476,8 @@ function setViewModeEpic(actions, store) {
         });
       }
 
+      const { CommitPhase } = (_nuclideHgRpc || _load_nuclideHgRpc()).hgConstants;
+
       const isPublishReady = () => store.getState().publish.state !== (_constants || _load_constants()).PublishModeState.AWAITING_PUBLISH;
 
       // If the latest head has a phabricator revision in the commit message,
@@ -479,13 +488,17 @@ function setViewModeEpic(actions, store) {
           message: null,
           mode: store.getState().publish.mode,
           state: (_constants || _load_constants()).PublishModeState.LOADING_PUBLISH_MESSAGE
-        })) : _rxjsBundlesRxMinJs.Observable.empty(), headCommitMessageChanges.switchMap(headCommitMessage => {
+        })) : _rxjsBundlesRxMinJs.Observable.empty(), headRevisionChanges.switchMap(headRevision => {
           if (!isPublishReady()) {
             // An amend can come as part of publishing new revisions.
             // So, skip updating if there's an ongoing publish.
             return _rxjsBundlesRxMinJs.Observable.empty();
+          } else if (headRevision.phase !== CommitPhase.DRAFT) {
+            atom.notifications.addWarning('Cannot publish public commits', { detail: 'Did you forget to commit your changes?' });
+            return _rxjsBundlesRxMinJs.Observable.from([(_Actions || _load_Actions()).setViewMode((_constants || _load_constants()).DiffMode.BROWSE_MODE), (_Actions || _load_Actions()).updatePublishState((0, (_createEmptyAppState || _load_createEmptyAppState()).getEmptyPublishState)())]);
           }
 
+          const headCommitMessage = headRevision.description;
           const phabricatorRevision = (0, (_utils2 || _load_utils2()).getPhabricatorRevisionFromCommitMessage)(headCommitMessage);
 
           let publishMessage;
@@ -532,8 +545,7 @@ function commit(actions, store) {
     let consoleShown = false;
 
     // If the commit/amend and publish option are chosen
-    let optionalPublishAction;
-    if (shouldPublishOnCommit) {
+    function getPublishActions() {
       let publishMode;
       let publishUpdateMessage;
       if (publish.message == null) {
@@ -544,11 +556,9 @@ function commit(actions, store) {
         publishMode = (_constants || _load_constants()).PublishMode.UPDATE;
       }
 
-      optionalPublishAction = _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState(Object.assign({}, publish, {
+      return _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState(Object.assign({}, publish, {
         mode: publishMode
       })), (_Actions || _load_Actions()).publishDiff(repository, publishUpdateMessage, isPrepareMode, null, publishUpdates));
-    } else {
-      optionalPublishAction = _rxjsBundlesRxMinJs.Observable.empty();
     }
 
     const resetCommitAction = (_Actions || _load_Actions()).updateCommitState({
@@ -568,31 +578,34 @@ function commit(actions, store) {
           return _rxjsBundlesRxMinJs.Observable.concat(bookmarkName != null && bookmarkName.length > 0 ? _rxjsBundlesRxMinJs.Observable.fromPromise(repository.createBookmark(bookmarkName)).ignoreElements() : _rxjsBundlesRxMinJs.Observable.empty(), repository.commit(message));
         case (_constants || _load_constants()).CommitMode.AMEND:
           (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-commit-amend');
-          return repository.amend(message, (0, (_utils || _load_utils()).getAmendMode)(shouldRebaseOnAmend)).do(processMessage => {
-            if (!consoleShown && SHOW_CONSOLE_ON_PROCESS_EVENTS.includes(processMessage.kind)) {
-              (0, (_streamProcessToConsoleMessages || _load_streamProcessToConsoleMessages()).dispatchConsoleToggle)(true);
-              consoleShown = true;
-            }
-          });
+          return repository.amend(message, (0, (_utils || _load_utils()).getAmendMode)(shouldRebaseOnAmend));
         default:
           return _rxjsBundlesRxMinJs.Observable.throw(new Error(`Invalid Commit Mode ${ mode }`));
       }
-    })).do((_streamProcessToConsoleMessages || _load_streamProcessToConsoleMessages()).pipeProcessMessagesToConsole.bind(null, mode, publishUpdates)).switchMap(processMessage => {
+    })).do(processMessage => {
+      (0, (_streamProcessToConsoleMessages || _load_streamProcessToConsoleMessages()).pipeProcessMessagesToConsole)(mode, publishUpdates, processMessage);
+      if (!consoleShown && SHOW_CONSOLE_ON_PROCESS_EVENTS.includes(processMessage.kind)) {
+        (0, (_streamProcessToConsoleMessages || _load_streamProcessToConsoleMessages()).dispatchConsoleToggle)(true);
+        consoleShown = true;
+      }
+    }).switchMap(processMessage => {
       if (processMessage.kind !== 'exit') {
         return _rxjsBundlesRxMinJs.Observable.empty();
       } else if (processMessage.exitCode !== 0) {
-        optionalPublishAction = _rxjsBundlesRxMinJs.Observable.empty();
         return _rxjsBundlesRxMinJs.Observable.of(resetCommitAction);
+      }
+      const resetFromCommitViewActions = _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).setViewMode((_constants || _load_constants()).DiffMode.BROWSE_MODE), (_Actions || _load_Actions()).updateCommitState((0, (_createEmptyAppState || _load_createEmptyAppState()).getEmptyCommitState)()));
+      if (shouldPublishOnCommit) {
+        return resetFromCommitViewActions.concat(getPublishActions());
       } else {
-        return _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).setViewMode((_constants || _load_constants()).DiffMode.BROWSE_MODE), (_Actions || _load_Actions()).updateCommitState((0, (_createEmptyAppState || _load_createEmptyAppState()).getEmptyCommitState)()));
+        return resetFromCommitViewActions;
       }
     }).catch(error => {
       atom.notifications.addError('Couldn\'t commit code', {
         detail: error
       });
-      optionalPublishAction = _rxjsBundlesRxMinJs.Observable.empty();
       return _rxjsBundlesRxMinJs.Observable.of(resetCommitAction);
-    }), optionalPublishAction);
+    }));
   });
 }
 
@@ -607,12 +620,13 @@ function publishDiff(actions, store) {
     const { publish: { mode }, shouldRebaseOnAmend, verbatimModeEnabled } = store.getState();
 
     const amendCleanupMessage = mode === (_constants || _load_constants()).PublishMode.CREATE ? message : null;
+    (0, (_streamProcessToConsoleMessages || _load_streamProcessToConsoleMessages()).dispatchConsoleToggle)(true);
 
     return _rxjsBundlesRxMinJs.Observable.concat(_rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState({
       mode,
       message,
       state: (_constants || _load_constants()).PublishModeState.AWAITING_PUBLISH
-    })), _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_utils || _load_utils()).promptToCleanDirtyChanges)(repository, amendCleanupMessage, shouldRebaseOnAmend)).switchMap(cleanResult => {
+    })), _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_utils || _load_utils()).promptToCleanDirtyChanges)(repository, amendCleanupMessage, shouldRebaseOnAmend, publishUpdates)).switchMap(cleanResult => {
       if (cleanResult == null) {
         atom.notifications.addWarning('You have uncommitted changes!', {
           dismissable: true,
@@ -631,8 +645,6 @@ function publishDiff(actions, store) {
           throw new Error('Invariant violation: "headRevision != null"');
         }
 
-        (0, (_streamProcessToConsoleMessages || _load_streamProcessToConsoleMessages()).dispatchConsoleToggle)(true);
-
         switch (mode) {
           case (_constants || _load_constants()).PublishMode.CREATE:
             (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-publish-create');
@@ -644,17 +656,17 @@ function publishDiff(actions, store) {
             (0, (_notifications || _load_notifications()).notifyInternalError)(new Error(`Invalid Publish Mode: ${ mode }`));
             return _rxjsBundlesRxMinJs.Observable.empty();
         }
-      }).ignoreElements().concat(_rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState((0, (_createEmptyAppState || _load_createEmptyAppState()).getEmptyPublishState)()), (_Actions || _load_Actions()).setViewMode((_constants || _load_constants()).DiffMode.BROWSE_MODE))).catch(error => {
-        atom.notifications.addError('Couldn\'t Publish to Phabricator', {
-          detail: error.message,
-          nativeFriendly: true
-        });
-        return _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState({
-          mode,
-          message,
-          state: (_constants || _load_constants()).PublishModeState.PUBLISH_ERROR
-        }));
+      }).ignoreElements().concat(_rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState((0, (_createEmptyAppState || _load_createEmptyAppState()).getEmptyPublishState)()), (_Actions || _load_Actions()).setViewMode((_constants || _load_constants()).DiffMode.BROWSE_MODE)));
+    }).catch(error => {
+      atom.notifications.addError('Couldn\'t Publish to Phabricator', {
+        detail: error.message,
+        nativeFriendly: true
       });
+      return _rxjsBundlesRxMinJs.Observable.of((_Actions || _load_Actions()).updatePublishState({
+        mode,
+        message,
+        state: (_constants || _load_constants()).PublishModeState.PUBLISH_ERROR
+      }));
     }));
   });
 }

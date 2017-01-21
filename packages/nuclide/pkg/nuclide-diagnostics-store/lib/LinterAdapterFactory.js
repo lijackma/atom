@@ -78,10 +78,6 @@ function validateLinter(provider) {
 
     validate(provider.scope === 'file' || provider.scope === 'project', `Scope must be 'file' or 'project'; found '${ provider.scope }'`, errors);
 
-    if (provider.scope === 'project') {
-      validate(!provider.lintOnFly, "lintOnFly must be false for a linter with 'project' scope", errors);
-    }
-
     validate(provider.lint, 'lint function must be specified', errors);
     validate(typeof provider.lint === 'function', 'lint must be a function', errors);
 

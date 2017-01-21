@@ -147,7 +147,7 @@ const INSTALLABLE_RULES = new Set(['apple_bundle', 'apk_genrule']);
 
 const DEBUGGABLE_RULES = new Set([
 // $FlowFixMe: spreadable sets
-...INSTALLABLE_RULES, 'cxx_binary', 'cxx_test']);
+...INSTALLABLE_RULES, 'cxx_binary', 'cxx_test', 'rust_binary', 'rust_test']);
 
 function isInstallableRule(ruleType) {
   return INSTALLABLE_RULES.has(ruleType);

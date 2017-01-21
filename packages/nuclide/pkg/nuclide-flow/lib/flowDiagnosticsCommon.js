@@ -23,10 +23,10 @@ var _atom = require('atom');
 function extractRange(message) {
   // It's unclear why the 1-based to 0-based indexing works the way that it
   // does, but this has the desired effect in the UI, in practice.
-  const range = message.range;
-  if (range == null) {
+  const { rangeInFile } = message;
+  if (rangeInFile == null) {
     return undefined;
   } else {
-    return new _atom.Range([range.start.line - 1, range.start.column - 1], [range.end.line - 1, range.end.column]);
+    return new _atom.Range([rangeInFile.range.start.row - 1, rangeInFile.range.start.column - 1], [rangeInFile.range.end.row - 1, rangeInFile.range.end.column]);
   }
 }

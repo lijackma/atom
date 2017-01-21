@@ -126,14 +126,16 @@ class AtomTextEditor extends _reactForAtom.React.Component {
       return;
     }
 
-    this._editorDisposables.add(textEditorElement.onDidAttach(() => {
-      const correctlySizedElement = textEditorElement.querySelector('* /deep/ .lines > :first-child > :first-child');
-      if (correctlySizedElement == null) {
-        return;
-      }
-      const { width } = correctlySizedElement.style;
-      container.style.width = width;
-    }));
+    if (this.props.correctContainerWidth) {
+      this._editorDisposables.add(textEditorElement.onDidAttach(() => {
+        const correctlySizedElement = textEditorElement.querySelector('* /deep/ .lines > :first-child > :first-child');
+        if (correctlySizedElement == null) {
+          return;
+        }
+        const { width } = correctlySizedElement.style;
+        container.style.width = width;
+      }));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -225,6 +227,7 @@ class AtomTextEditor extends _reactForAtom.React.Component {
 }
 exports.AtomTextEditor = AtomTextEditor;
 AtomTextEditor.defaultProps = {
+  correctContainerWidth: true,
   disabled: false,
   gutterHidden: false,
   lineNumberGutterVisible: true,

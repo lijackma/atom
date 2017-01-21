@@ -143,8 +143,11 @@ class DiffViewNavigatorComponent extends _reactForAtom.React.Component {
     return _reactForAtom.React.createElement(
       'div',
       { className: 'nuclide-diff-view-navigator-file-changes-container' },
-      sectionNavigator,
-      _reactForAtom.React.createElement('div', { className: 'nuclide-diff-view-navigator-horizontal-selector' }),
+      _reactForAtom.React.createElement(
+        'div',
+        null,
+        sectionNavigator
+      ),
       (0, (_DiffViewComponent || _load_DiffViewComponent()).renderFileChanges)(this.props.diffModel)
     );
   }

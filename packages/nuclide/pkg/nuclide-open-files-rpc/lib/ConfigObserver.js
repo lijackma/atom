@@ -55,7 +55,6 @@ class ConfigObserver {
     // TODO: Consider incrementally updating, rather than recomputing on each event.
     this._subscription = cache.observeFileEvents().filter(fileEvent => fileEvent.kind !== (_constants || _load_constants()).FileEventKind.EDIT).mapTo(undefined).merge(cache.observeDirectoryEvents().mapTo(undefined)).switchMap(() => _rxjsBundlesRxMinJs.Observable.fromPromise(this._computeOpenConfigs())).distinctUntilChanged((_collection || _load_collection()).areSetsEqual)
     // Filter out initial empty set, which duplicates the initial value of the BehaviorSubject
-    // $FlowFixMe: add skipWhile to flow-typed rx definitions
     .skipWhile(dirs => dirs.size === 0).subscribe(this._currentConfigs);
   }
 

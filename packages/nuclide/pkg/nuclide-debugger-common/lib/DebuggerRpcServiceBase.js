@@ -112,6 +112,15 @@ class DebuggerRpcWebSocketService extends DebuggerRpcServiceBase {
         // Successfully connected with WS server, fulfill the promise.
         resolve(ws);
       });
+      ws.on('error', error => {
+        reject(error);
+        this.dispose();
+      });
+      ws.on('close', (code, reason) => {
+        const message = `WebSocket closed with: ${ code }, ${ reason }`;
+        reject(Error(message));
+        this.dispose();
+      });
     });
   }
 

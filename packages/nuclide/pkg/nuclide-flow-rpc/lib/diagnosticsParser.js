@@ -4,15 +4,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.flowStatusOutputToDiagnostics = flowStatusOutputToDiagnostics;
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- */
+
+var _simpleTextBuffer;
+
+function _load_simpleTextBuffer() {
+  return _simpleTextBuffer = require('simple-text-buffer');
+}
 
 function flowStatusOutputToDiagnostics(root, statusOutput) {
   const errors = statusOutput.errors;
@@ -43,12 +40,20 @@ function flowStatusOutputToDiagnostics(root, statusOutput) {
     flowRoot: root,
     messages
   };
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function flowMessageComponentToMessageComponent(component) {
   return {
     descr: component.descr,
-    range: maybeFlowLocToRange(component.loc)
+    rangeInFile: maybeFlowLocToRange(component.loc)
   };
 }
 
@@ -59,13 +64,6 @@ function maybeFlowLocToRange(loc) {
 function flowLocToRange(loc) {
   return {
     file: loc.source,
-    start: {
-      line: loc.start.line,
-      column: loc.start.column
-    },
-    end: {
-      line: loc.end.line,
-      column: loc.end.column
-    }
+    range: new (_simpleTextBuffer || _load_simpleTextBuffer()).Range([loc.start.line, loc.start.column], [loc.end.line, loc.end.column])
   };
 }

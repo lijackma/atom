@@ -225,7 +225,7 @@ class TestRunnerPanel extends _reactForAtom.React.Component {
 
     return _reactForAtom.React.createElement(
       (_PanelComponent || _load_PanelComponent()).PanelComponent,
-      { dock: 'bottom' },
+      { dock: 'bottom', doNotSetSize: true },
       _reactForAtom.React.createElement(
         'div',
         { className: 'nuclide-test-runner-panel' },

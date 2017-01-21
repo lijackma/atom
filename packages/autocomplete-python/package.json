@@ -2,40 +2,40 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
+        "raw": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
-        "spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
+        "rawSpec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
+        "spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/apm-install-dir-11706-14083-noq63x"
+      "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/apm-install-dir-117021-7005-1t2cjsy"
     ]
   ],
-  "_from": "../d-11706-14083-1fohyjb/package.tgz",
-  "_id": "autocomplete-python@1.8.26",
+  "_from": "../d-117021-7005-ysfg4i/package.tgz",
+  "_id": "autocomplete-python@1.8.27",
   "_inCache": true,
   "_installable": true,
   "_location": "/autocomplete-python",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
+    "raw": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
-    "spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
+    "rawSpec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
+    "spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-11706-14083-1fohyjb/package.tgz",
-  "_shasum": "3a350b4952f9b3e8a7761ea9dbd5f4e0d8350bce",
+  "_resolved": "file:../d-117021-7005-ysfg4i/package.tgz",
+  "_shasum": "46564f9c80b47aa9caa50bc4718244fda8b28724",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-11706-14083-1fohyjb/package.tgz",
-  "_where": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/apm-install-dir-11706-14083-noq63x",
+  "_spec": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/d-117021-7005-ysfg4i/package.tgz",
+  "_where": "/private/var/folders/s9/cbkbndvd04s4v8ph8dw0s4k80000gn/T/apm-install-dir-117021-7005-1t2cjsy",
   "bugs": {
     "url": "https://github.com/autocomplete-python/autocomplete-python/issues"
   },
@@ -100,5 +100,5 @@
     "type": "git",
     "url": "git+https://github.com/autocomplete-python/autocomplete-python.git"
   },
-  "version": "1.8.26"
+  "version": "1.8.27"
 }

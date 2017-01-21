@@ -53,6 +53,12 @@ function _load_bindObservableAsProps() {
   return _bindObservableAsProps = require('../../nuclide-ui/bindObservableAsProps');
 }
 
+var _tabBarView;
+
+function _load_tabBarView() {
+  return _tabBarView = _interopRequireDefault(require('../../nuclide-ui/VendorLib/atom-tabs/lib/tab-bar-view'));
+}
+
 var _observeAddedPaneItems;
 
 function _load_observeAddedPaneItems() {
@@ -97,6 +103,11 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const HIDE_BUTTON_WRAPPER_CLASS = 'nuclide-workspace-views-panel-location-tabs-hide-button-wrapper';
+
+/**
+ * Manages views for an Atom panel.
+ */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -107,11 +118,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * 
  */
 
-const HIDE_BUTTON_WRAPPER_CLASS = 'nuclide-workspace-views-panel-location-tabs-hide-button-wrapper';
-
-/**
- * Manages views for an Atom panel.
- */
 class PanelLocation extends (_SimpleModel || _load_SimpleModel()).SimpleModel {
 
   constructor(locationId, serializedState = {}) {
@@ -155,49 +161,21 @@ class PanelLocation extends (_SimpleModel || _load_SimpleModel()).SimpleModel {
     _rxjsBundlesRxMinJs.Observable.from(this).map(state => state.visible).distinctUntilChanged()),
 
     // Add a tab bar to any panes created in the container.
-    // TODO: Account for the disabling of the atom-tabs package. We assume that it will be
-    //   activated, but that isn't necessarily true. Continuing to use the atom-tabs logic while
-    //   avoiding that assumption will likely mean a change to atom-tabs that makes it more
-    //   generic.
     paneContainer.observePanes(pane => {
-      const tabBarView = document.createElement('ul', 'atom-tabs');
-      tabBarView.classList.add('nuclide-workspace-views-panel-location-tabs');
+      const tabBarView = new (_tabBarView || _load_tabBarView()).default(pane);
+      const paneElement = atom.views.getView(pane);
+      paneElement.insertBefore(tabBarView.element, paneElement.firstChild);
+      tabBarView.element.classList.add('nuclide-workspace-views-panel-location-tabs');
 
-      const initializeTabBar = () => {
-        if (!(typeof tabBarView.initialize === 'function')) {
-          throw new Error('Invariant violation: "typeof tabBarView.initialize === \'function\'"');
-        }
-
-        tabBarView.initialize(pane);
-        const paneElement = atom.views.getView(pane);
-        paneElement.insertBefore(tabBarView, paneElement.firstChild);
-
-        const hideButtonWrapper = document.createElement('div');
-        hideButtonWrapper.className = HIDE_BUTTON_WRAPPER_CLASS;
-        const hideButton = document.createElement('div');
-        hideButton.className = 'nuclide-workspace-views-panel-location-tabs-hide-button';
-        hideButton.onclick = () => {
-          this.setState({ visible: false });
-        };
-        hideButtonWrapper.appendChild(hideButton);
-        tabBarView.appendChild(hideButtonWrapper);
+      const hideButtonWrapper = document.createElement('div');
+      hideButtonWrapper.className = HIDE_BUTTON_WRAPPER_CLASS;
+      const hideButton = document.createElement('div');
+      hideButton.className = 'nuclide-workspace-views-panel-location-tabs-hide-button';
+      hideButton.onclick = () => {
+        this.setState({ visible: false });
       };
-
-      // It's possible that the tabs package may not have activated yet (and therefore that the
-      // atom-tabs element won't have been upgraded). If that's the case, wait for it to do so and
-      // then initialize the tab bar.
-      if (typeof tabBarView.initialize === 'function') {
-        initializeTabBar();
-      } else {
-        const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.packages.onDidActivatePackage(pkg => {
-          if (typeof tabBarView.initialize === 'function') {
-            initializeTabBar();
-            disposables.dispose();
-          }
-        }), pane.onDidDestroy(() => {
-          disposables.dispose();
-        }));
-      }
+      hideButtonWrapper.appendChild(hideButton);
+      tabBarView.element.appendChild(hideButtonWrapper);
     }),
 
     // The atom/tabs package identifies the pane item being dragged [based on the child index of

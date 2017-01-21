@@ -5,6 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.filterEmptyResults = filterEmptyResults;
 exports.flattenResults = flattenResults;
+exports.getOuterResults = getOuterResults;
 
 var _collection;
 
@@ -12,19 +13,8 @@ function _load_collection() {
   return _collection = require('../../commons-node/collection');
 }
 
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- */
-
 function filterEmptyResults(resultsGroupedByService) {
   const filteredTree = {};
-
   for (const serviceName in resultsGroupedByService) {
     const directories = resultsGroupedByService[serviceName].results;
     const nonEmptyDirectories = {};
@@ -38,7 +28,15 @@ function filterEmptyResults(resultsGroupedByService) {
     }
   }
   return filteredTree;
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function flattenResults(resultsGroupedByService) {
   const items = [];
@@ -48,4 +46,21 @@ function flattenResults(resultsGroupedByService) {
     }
   }
   return Array.prototype.concat.apply([], items);
+}
+
+function getOuterResults(location, resultsByService) {
+  const nonEmptyResults = filterEmptyResults(resultsByService);
+  const serviceNames = Object.keys(nonEmptyResults);
+  const serviceName = location === 'top' ? serviceNames[0] : serviceNames[serviceNames.length - 1];
+  if (serviceName == null) {
+    return null;
+  }
+  const directoryNames = Object.keys(nonEmptyResults[serviceName].results);
+  const directoryName = location === 'top' ? directoryNames[0] : directoryNames[directoryNames.length - 1];
+  const results = nonEmptyResults[serviceName].results[directoryName].results;
+  return {
+    serviceName,
+    directoryName,
+    results
+  };
 }

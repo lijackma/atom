@@ -57,7 +57,17 @@ function _load_DebuggerThreadsComponent() {
   return _DebuggerThreadsComponent = require('./DebuggerThreadsComponent');
 }
 
-class NewDebuggerView extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class NewDebuggerView extends _reactForAtom.React.PureComponent {
 
   constructor(props) {
     super(props);
@@ -65,20 +75,8 @@ class NewDebuggerView extends _reactForAtom.React.Component {
     this._scopesComponentWrapped = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props.model.getScopesStore().getScopes().map(scopes => ({ scopes })), (_ScopesComponent || _load_ScopesComponent()).ScopesComponent);
     this._disposables = new _atom.CompositeDisposable();
     const debuggerStore = props.model.getStore();
-    const threadStore = props.model.getThreadStore();
     this.state = {
-      allowSingleThreadStepping: Boolean(debuggerStore.getSettings().get('SingleThreadStepping')),
-      debuggerMode: debuggerStore.getDebuggerMode(),
-      togglePauseOnException: debuggerStore.getTogglePauseOnException(),
-      togglePauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
-      enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
-      showThreadsWindow: Boolean(debuggerStore.getSettings().get('SupportThreadsWindow')),
-      selectedCallFrameIndex: props.model.getCallstackStore().getSelectedCallFrameIndex(),
-      callstack: props.model.getCallstackStore().getCallstack(),
-      breakpoints: props.model.getBreakpointStore().getAllBreakpoints(),
-      threadList: threadStore.getThreadList(),
-      selectedThreadId: threadStore.getSelectedThreadId(),
-      customControlButtons: debuggerStore.getCustomControlButtons()
+      showThreadsWindow: Boolean(debuggerStore.getSettings().get('SupportThreadsWindow'))
     };
   }
 
@@ -86,35 +84,7 @@ class NewDebuggerView extends _reactForAtom.React.Component {
     const debuggerStore = this.props.model.getStore();
     this._disposables.add(debuggerStore.onChange(() => {
       this.setState({
-        // We need to refetch some values that we already got in the constructor
-        // since these values weren't necessarily properly intialized until now.
-        allowSingleThreadStepping: Boolean(debuggerStore.getSettings().get('SingleThreadStepping')),
-        debuggerMode: debuggerStore.getDebuggerMode(),
-        togglePauseOnException: debuggerStore.getTogglePauseOnException(),
-        togglePauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
-        enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
-        showThreadsWindow: Boolean(debuggerStore.getSettings().get('SupportThreadsWindow')),
-        customControlButtons: debuggerStore.getCustomControlButtons()
-      });
-    }));
-    const callstackStore = this.props.model.getCallstackStore();
-    this._disposables.add(callstackStore.onChange(() => {
-      this.setState({
-        selectedCallFrameIndex: callstackStore.getSelectedCallFrameIndex(),
-        callstack: callstackStore.getCallstack()
-      });
-    }));
-    const breakpointStore = this.props.model.getBreakpointStore();
-    this._disposables.add(breakpointStore.onNeedUIUpdate(() => {
-      this.setState({
-        breakpoints: breakpointStore.getAllBreakpoints()
-      });
-    }));
-    const threadStore = this.props.model.getThreadStore();
-    this._disposables.add(threadStore.onChange(() => {
-      this.setState({
-        threadList: threadStore.getThreadList(),
-        selectedThreadId: threadStore.getSelectedThreadId()
+        showThreadsWindow: Boolean(debuggerStore.getSettings().get('SupportThreadsWindow'))
       });
     }));
   }
@@ -139,8 +109,7 @@ class NewDebuggerView extends _reactForAtom.React.Component {
         { className: 'nuclide-debugger-section-content' },
         _reactForAtom.React.createElement((_DebuggerThreadsComponent || _load_DebuggerThreadsComponent()).DebuggerThreadsComponent, {
           bridge: this.props.model.getBridge(),
-          threadList: this.state.threadList,
-          selectedThreadId: this.state.selectedThreadId
+          threadStore: model.getThreadStore()
         })
       )
     ) : null;
@@ -156,12 +125,7 @@ class NewDebuggerView extends _reactForAtom.React.Component {
           { className: 'nuclide-debugger-section-content' },
           _reactForAtom.React.createElement((_DebuggerSteppingComponent || _load_DebuggerSteppingComponent()).DebuggerSteppingComponent, {
             actions: actions,
-            debuggerMode: this.state.debuggerMode,
-            pauseOnException: this.state.togglePauseOnException,
-            pauseOnCaughtException: this.state.togglePauseOnCaughtException,
-            allowSingleThreadStepping: this.state.allowSingleThreadStepping,
-            singleThreadStepping: this.state.enableSingleThreadStepping,
-            customControlButtons: this.state.customControlButtons
+            debuggerStore: model.getStore()
           })
         )
       ),
@@ -175,9 +139,8 @@ class NewDebuggerView extends _reactForAtom.React.Component {
           { className: 'nuclide-debugger-section-content' },
           _reactForAtom.React.createElement((_DebuggerCallstackComponent || _load_DebuggerCallstackComponent()).DebuggerCallstackComponent, {
             actions: actions,
-            callstack: this.state.callstack,
-            bridge: this.props.model.getBridge(),
-            selectedCallFrameIndex: this.state.selectedCallFrameIndex
+            bridge: model.getBridge(),
+            callstackStore: model.getCallstackStore()
           })
         )
       ),
@@ -190,7 +153,7 @@ class NewDebuggerView extends _reactForAtom.React.Component {
           { className: 'nuclide-debugger-section-content' },
           _reactForAtom.React.createElement((_BreakpointListComponent || _load_BreakpointListComponent()).BreakpointListComponent, {
             actions: actions,
-            breakpoints: this.state.breakpoints
+            breakpointStore: model.getBreakpointStore()
           })
         )
       ),
@@ -228,12 +191,4 @@ class NewDebuggerView extends _reactForAtom.React.Component {
     this._disposables.dispose();
   }
 }
-exports.NewDebuggerView = NewDebuggerView; /**
-                                            * Copyright (c) 2015-present, Facebook, Inc.
-                                            * All rights reserved.
-                                            *
-                                            * This source code is licensed under the license found in the LICENSE file in
-                                            * the root directory of this source tree.
-                                            *
-                                            * 
-                                            */
+exports.NewDebuggerView = NewDebuggerView;

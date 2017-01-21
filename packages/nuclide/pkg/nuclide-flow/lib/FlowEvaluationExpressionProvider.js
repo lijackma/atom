@@ -11,16 +11,16 @@ function _load_range() {
   return _range = require('../../commons-atom/range');
 }
 
-var _constants;
+var _nuclideFlowCommon;
 
-function _load_constants() {
-  return _constants = require('./constants');
+function _load_nuclideFlowCommon() {
+  return _nuclideFlowCommon = require('../../nuclide-flow-common');
 }
 
 class FlowEvaluationExpressionProvider {
   getEvaluationExpression(editor, position) {
     // TODO: Replace RegExp with AST-based, more accurate approach.
-    const extractedIdentifier = (0, (_range || _load_range()).wordAtPosition)(editor, position, (_constants || _load_constants()).JAVASCRIPT_IDENTIFIER_REGEX);
+    const extractedIdentifier = (0, (_range || _load_range()).wordAtPosition)(editor, position, (_nuclideFlowCommon || _load_nuclideFlowCommon()).JAVASCRIPT_IDENTIFIER_REGEX);
     if (extractedIdentifier == null) {
       return Promise.resolve(null);
     }

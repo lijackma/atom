@@ -227,13 +227,14 @@ function _load_RemoteProjectsService() {
   return _RemoteProjectsService = _interopRequireDefault(require('./RemoteProjectsService'));
 }
 
+var _patchAtomWorkspaceReplace;
+
+function _load_patchAtomWorkspaceReplace() {
+  return _patchAtomWorkspaceReplace = _interopRequireDefault(require('./patchAtomWorkspaceReplace'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
-
-/**
- * Stores the host and cwd of a remote connection.
- */
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -243,6 +244,13 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
  *
  * 
  */
+
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+
+/**
+ * Stores the host and cwd of a remote connection.
+ */
+
 
 let packageSubscriptions = null;
 let controller = null;
@@ -493,6 +501,8 @@ function activate(state) {
       return textEditorPromise;
     }
   }));
+
+  subscriptions.add((0, (_patchAtomWorkspaceReplace || _load_patchAtomWorkspaceReplace()).default)());
 
   // If RemoteDirectoryProvider is called before this, and it failed
   // to provide a RemoteDirectory for a

@@ -34,6 +34,12 @@ function _load_collection() {
   return _collection = require('../../commons-node/collection');
 }
 
+var _event;
+
+function _load_event() {
+  return _event = require('../../commons-node/event');
+}
+
 var _reduxObservable;
 
 function _load_reduxObservable() {
@@ -110,17 +116,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // TODO: use a more general versioning mechanism.
 // Perhaps Atom should provide packages with some way of doing this.
-/**
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- *
- * 
- */
-
-const SERIALIZED_VERSION = 2;
+const SERIALIZED_VERSION = 2; /**
+                               * Copyright (c) 2015-present, Facebook, Inc.
+                               * All rights reserved.
+                               *
+                               * This source code is licensed under the license found in the LICENSE file in
+                               * the root directory of this source tree.
+                               *
+                               * 
+                               */
 
 class Activation {
 
@@ -176,10 +180,9 @@ class Activation {
     // We pass a stream of states to the epics expicitly. This is less than ideal. See
     // redux-observable/redux-observable#56
     // $FlowFixMe: Teach flow about Symbol.observable
-    _rxjsBundlesRxMinJs.Observable.from(this._store).subscribe(epicOptions.states),
-
-    // A stand-in for `atom.packages.didLoadInitialPackages` until atom/atom#12897
-    _rxjsBundlesRxMinJs.Observable.interval(0).take(1).map(() => (_Actions || _load_Actions()).didLoadInitialPackages()).subscribe(this._store.dispatch),
+    _rxjsBundlesRxMinJs.Observable.from(this._store).subscribe(epicOptions.states), activateInitialPackagesObservable().subscribe(() => {
+      this._store.dispatch((_Actions || _load_Actions()).didActivateInitialPackages());
+    }),
 
     // Whenever the visiblity changes, store the value in localStorage so that we can use it
     // to decide whether we should show the placeholder at the beginning of the next session.
@@ -383,6 +386,13 @@ class Activation {
 
 exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
 
+
+function activateInitialPackagesObservable() {
+  if (atom.packages.hasActivatedInitialPackages) {
+    return _rxjsBundlesRxMinJs.Observable.of(undefined);
+  }
+  return (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.packages.onDidActivateInitialPackages.bind(atom.packages));
+}
 
 function trackTaskAction(type, action, state) {
   const task = action.payload.task;

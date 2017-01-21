@@ -65,9 +65,9 @@ function activate(rawState) {
   }), new _atom.Disposable(() => {
     initialState = null;
   }));
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.python', 'BUCK');
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', 'BUCK.autodeps');
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', '.buckconfig');
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.python', ['BUCK']);
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', ['BUCK.autodeps']);
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', ['.buckconfig']);
 }
 
 function deactivate() {

@@ -114,14 +114,14 @@ class AtomLanguageService {
     const busySignalProvider = new (_nuclideBusySignal || _load_nuclideBusySignal()).DedupedBusySignalProviderBase();
     this._subscriptions.add(atom.packages.serviceHub.provide('nuclide-busy-signal', '0.1.0', busySignalProvider));
 
-    const highlightsConfig = this._config.highlights;
-    if (highlightsConfig != null) {
-      this._subscriptions.add((_CodeHighlightProvider || _load_CodeHighlightProvider()).CodeHighlightProvider.register(this._config.name, this._selector(), highlightsConfig, this._connectionToLanguageService));
+    const highlightConfig = this._config.highlight;
+    if (highlightConfig != null) {
+      this._subscriptions.add((_CodeHighlightProvider || _load_CodeHighlightProvider()).CodeHighlightProvider.register(this._config.name, this._selector(), highlightConfig, this._connectionToLanguageService));
     }
 
-    const outlinesConfig = this._config.outlines;
-    if (outlinesConfig != null) {
-      this._subscriptions.add((_OutlineViewProvider || _load_OutlineViewProvider()).OutlineViewProvider.register(this._config.name, this._selector(), outlinesConfig, this._connectionToLanguageService));
+    const outlineConfig = this._config.outline;
+    if (outlineConfig != null) {
+      this._subscriptions.add((_OutlineViewProvider || _load_OutlineViewProvider()).OutlineViewProvider.register(this._config.name, this._selector(), outlineConfig, this._connectionToLanguageService));
     }
 
     const coverageConfig = this._config.coverage;

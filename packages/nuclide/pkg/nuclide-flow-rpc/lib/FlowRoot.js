@@ -7,10 +7,10 @@ exports.FlowRoot = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _semver;
+var _simpleTextBuffer;
 
-function _load_semver() {
-  return _semver = _interopRequireDefault(require('semver'));
+function _load_simpleTextBuffer() {
+  return _simpleTextBuffer = require('simple-text-buffer');
 }
 
 var _nuclideLogging;
@@ -35,6 +35,12 @@ var _FlowVersion;
 
 function _load_FlowVersion() {
   return _FlowVersion = require('./FlowVersion');
+}
+
+var _prettyPrintTypes;
+
+function _load_prettyPrintTypes() {
+  return _prettyPrintTypes = _interopRequireDefault(require('./prettyPrintTypes'));
 }
 
 var _astToOutline;
@@ -116,10 +122,7 @@ class FlowRoot {
         if (json.path) {
           return {
             file: json.path,
-            point: {
-              line: json.line - 1,
-              column: json.start - 1
-            }
+            point: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(json.line - 1, json.start - 1)
           };
         } else {
           return null;
@@ -220,7 +223,7 @@ class FlowRoot {
     })();
   }
 
-  flowGetType(file, currentContents, line_, column_, includeRawType) {
+  flowGetType(file, currentContents, line_, column_) {
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -233,9 +236,6 @@ class FlowRoot {
       line++;
       column++;
       const args = ['type-at-pos', '--json', '--path', file, line, column];
-      if (includeRawType) {
-        args.push('--raw');
-      }
 
       let result;
       try {
@@ -255,11 +255,15 @@ class FlowRoot {
         return null;
       }
       const type = json.type;
-      const rawType = json.raw_type;
       if (!type || type === '(unknown)') {
         return null;
       }
-      return { type, rawType };
+      try {
+        return (0, (_prettyPrintTypes || _load_prettyPrintTypes()).default)(type);
+      } catch (e) {
+        logger.error(`Problem pretty printing type hint: ${ e.message }`);
+        return type;
+      }
     })();
   }
 
@@ -267,67 +271,10 @@ class FlowRoot {
     var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      // The coverage command doesn't actually have the required information until Flow v0.28. For
-      // earlier versions, we have to fall back on dump-types, which is slower especially in
-      // pathological cases. We can remove this entirely when we want to stop supporting versions
-      // earlier than v0.28.
-
-      const version = yield _this5._version.getVersion();
-      // Fall back to dump types if we don't know the version
-      const useDumpTypes = version == null || (_semver || _load_semver()).default.lte(version, '0.27.0');
-      return useDumpTypes ? yield _this5._getCoverageViaDumpTypes(path) : yield _this5._getCoverageViaCoverage(path);
-    })();
-  }
-
-  _getCoverageViaDumpTypes(path) {
-    var _this6 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const args = ['dump-types', '--json', path];
-      let result;
-      try {
-        result = yield _this6._process.execFlow(args, {});
-      } catch (e) {
-        return null;
-      }
-      if (result == null) {
-        return null;
-      }
-      let json;
-      try {
-        json = parseJSON(args, result.stdout);
-      } catch (e) {
-        // The error is already logged in parseJSON
-        return null;
-      }
-
-      const allEntries = json;
-
-      const uncoveredEntries = allEntries.filter(function (item) {
-        return item.type === '' || item.type === 'any';
-      });
-      const uncoveredRanges = uncoveredEntries.map(function (item) {
-        return (0, (_FlowHelpers || _load_FlowHelpers()).flowCoordsToAtomCoords)(item.loc);
-      });
-
-      const uncoveredCount = uncoveredEntries.length;
-      const totalCount = allEntries.length;
-      const coveredCount = totalCount - uncoveredCount;
-      return {
-        percentage: totalCount === 0 ? 100 : coveredCount / totalCount * 100,
-        uncoveredRanges
-      };
-    })();
-  }
-
-  _getCoverageViaCoverage(path) {
-    var _this7 = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
       const args = ['coverage', '--json', path];
       let result;
       try {
-        result = yield _this7._process.execFlow(args, {});
+        result = yield _this5._process.execFlow(args, {});
       } catch (e) {
         return null;
       }
@@ -348,21 +295,23 @@ class FlowRoot {
       const coveredCount = expressions.covered_count;
       const totalCount = uncoveredCount + coveredCount;
 
-      const uncoveredRanges = expressions.uncovered_locs.map((_FlowHelpers || _load_FlowHelpers()).flowCoordsToAtomCoords);
+      const uncoveredRegions = expressions.uncovered_locs.map((_FlowHelpers || _load_FlowHelpers()).flowCoordsToAtomCoords).map(function (range) {
+        return { range };
+      });
 
       return {
         percentage: totalCount === 0 ? 100 : coveredCount / totalCount * 100,
-        uncoveredRanges
+        uncoveredRegions
       };
     })();
   }
 
   _forceRecheck(file) {
-    var _this8 = this;
+    var _this6 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       try {
-        yield _this8._process.execFlow(['force-recheck', file],
+        yield _this6._process.execFlow(['force-recheck', file],
         /* options */{},
         // Make an attempt to force a recheck, but if the server is busy don't insist.
         /* waitsForServer */false,

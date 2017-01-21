@@ -19,28 +19,57 @@ function _load_Table() {
   return _Table = require('../../nuclide-ui/Table');
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const activeThreadIndicatorComponent = props => _reactForAtom.React.createElement(
   'div',
   { className: 'nuclide-debugger-thread-list-item-current-indicator' },
   props.cellData ? _reactForAtom.React.createElement((_Icon || _load_Icon()).Icon, { icon: 'arrow-right', title: 'Selected Thread' }) : null
-); /**
-    * Copyright (c) 2015-present, Facebook, Inc.
-    * All rights reserved.
-    *
-    * This source code is licensed under the license found in the LICENSE file in
-    * the root directory of this source tree.
-    *
-    * 
-    */
+);
 
 class DebuggerThreadsComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._handleSelectThread = this._handleSelectThread.bind(this);
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this.state = {
+      threadList: props.threadStore.getThreadList(),
+      selectedThreadId: props.threadStore.getSelectedThreadId()
+    };
   }
 
-  _handleSelectThread(data, selectedIndex) {
+  componentDidMount() {
+    const { threadStore } = this.props;
+    this._disposables.add(threadStore.onChange(() => {
+      this.setState({
+        threadList: threadStore.getThreadList(),
+        selectedThreadId: threadStore.getSelectedThreadId()
+      });
+    }));
+  }
+
+  componentWillUnmount() {
+    this._disposables.dispose();
+  }
+
+  _handleSelectThread(data) {
     this.props.bridge.selectThread(data.id);
   }
 
@@ -48,7 +77,7 @@ class DebuggerThreadsComponent extends _reactForAtom.React.Component {
     const {
       threadList,
       selectedThreadId
-    } = this.props;
+    } = this.state;
     const columns = [{
       component: activeThreadIndicatorComponent,
       title: '',

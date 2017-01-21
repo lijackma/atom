@@ -44,16 +44,16 @@ function _load_classnames() {
   return _classnames = _interopRequireDefault(require('classnames'));
 }
 
-var _searchResultHelpers;
-
-function _load_searchResultHelpers() {
-  return _searchResultHelpers = require('./searchResultHelpers');
-}
-
 var _nuclideUri;
 
 function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
+}
+
+var _searchResultHelpers;
+
+function _load_searchResultHelpers() {
+  return _searchResultHelpers = require('./searchResultHelpers');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -87,7 +87,6 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
-    this._emitter = new _atom.Emitter();
     this._subscriptions = new _atom.CompositeDisposable();
     this._isMounted = false;
     this.state = {
@@ -119,22 +118,6 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
   /**
    * Public API
    */
-  onCancellation(callback) {
-    return this._emitter.on('canceled', callback);
-  }
-
-  onSelection(callback) {
-    return this._emitter.on('selected', callback);
-  }
-
-  onSelectionChanged(callback) {
-    return this._emitter.on('selection-changed', callback);
-  }
-
-  onItemsChanged(callback) {
-    return this._emitter.on('items-changed', callback);
-  }
-
   focus() {
     this._getInputTextEditor().focus();
   }
@@ -177,16 +160,19 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
       }, () => {
         process.nextTick(() => this._setQuery(this.refs.queryInput.getText()));
         this._updateQueryHandler();
-        this._emitter.emit('items-changed', lastResults);
+        if (this.props.onItemsChanged != null) {
+          this.props.onItemsChanged(lastResults);
+        }
       });
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.resultsByService !== this.state.resultsByService) {
-      this._emitter.emit('items-changed', this.state.resultsByService);
+      if (this.props.onItemsChanged != null) {
+        this.props.onItemsChanged(this.state.resultsByService);
+      }
     }
-
     if (prevState.selectedItemIndex !== this.state.selectedItemIndex || prevState.selectedService !== this.state.selectedService || prevState.selectedDirectory !== this.state.selectedDirectory) {
       this._updateScrollPosition();
     }
@@ -212,7 +198,6 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
 
   componentWillUnmount() {
     this._isMounted = false;
-    this._emitter.dispose();
     this._subscriptions.dispose();
   }
 
@@ -230,18 +215,20 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
     }
   }
 
-  _handleMovePreviousTab() {
+  _handleMovePreviousTab(event) {
     const currentProviderName = this.props.searchResultManager.getActiveProviderName();
     const currentTabIndex = this.state.renderableProviders.findIndex(tab => tab.name === currentProviderName);
     const previousProvider = this.state.renderableProviders[currentTabIndex - 1] || this.state.renderableProviders[this.state.renderableProviders.length - 1];
     this.props.quickSelectionActions.changeActiveProvider(previousProvider.name);
+    event.stopImmediatePropagation();
   }
 
-  _handleMoveNextTab() {
+  _handleMoveNextTab(event) {
     const currentProviderName = this.props.searchResultManager.getActiveProviderName();
     const currentTabIndex = this.state.renderableProviders.findIndex(tab => tab.name === currentProviderName);
     const nextProvider = this.state.renderableProviders[currentTabIndex + 1] || this.state.renderableProviders[0];
     this.props.quickSelectionActions.changeActiveProvider(nextProvider.name);
+    event.stopImmediatePropagation();
   }
 
   _handleMoveToBottom() {
@@ -265,7 +252,7 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
     // If the click did not happen on the modal or on any of its descendants,
     // the click was elsewhere on the document and should close the modal.
     if (event.target !== modal && !modal.contains(event.target)) {
-      this.props.onBlur();
+      this.props.onCancellation();
     }
   }
 
@@ -314,14 +301,12 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
   _select() {
     const selectedItem = this._getItemAtIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex);
     if (!selectedItem) {
-      this._cancel();
+      this.props.onCancellation();
     } else {
-      this._emitter.emit('selected', selectedItem);
+      const providerName = this.props.searchResultManager.getActiveProviderName();
+      const query = this._getTextEditor().getText();
+      this.props.onSelection([selectedItem], providerName, query);
     }
-  }
-
-  _cancel() {
-    this._emitter.emit('canceled');
   }
 
   _getCurrentResultContext() {
@@ -432,7 +417,7 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
   }
 
   _moveSelectionToBottom(userInitiated) {
-    const bottom = this._getOuterResults(Array.prototype.pop);
+    const bottom = (0, (_searchResultHelpers || _load_searchResultHelpers()).getOuterResults)('bottom', this.state.resultsByService);
     if (!bottom) {
       return;
     }
@@ -440,26 +425,11 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
   }
 
   _moveSelectionToTop(userInitiated) {
-    const top = this._getOuterResults(Array.prototype.shift);
+    const top = (0, (_searchResultHelpers || _load_searchResultHelpers()).getOuterResults)('top', this.state.resultsByService);
     if (!top) {
       return;
     }
     this._setSelectedIndex(top.serviceName, top.directoryName, 0, userInitiated);
-  }
-
-  _getOuterResults(arrayOperation) {
-    const nonEmptyResults = (0, (_searchResultHelpers || _load_searchResultHelpers()).filterEmptyResults)(this.state.resultsByService);
-    const serviceName = arrayOperation.call(Object.keys(nonEmptyResults));
-    if (!serviceName) {
-      return null;
-    }
-    const service = nonEmptyResults[serviceName];
-    const directoryName = arrayOperation.call(Object.keys(service.results));
-    return {
-      serviceName,
-      directoryName,
-      results: nonEmptyResults[serviceName].results[directoryName].results
-    };
   }
 
   _getItemAtIndex(serviceName, directory, itemIndex) {
@@ -489,7 +459,12 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
       hasUserSelection: userInitiated
     };
     this.setState(newState, () => {
-      this._emitter.emit('selection-changed', this._getSelectedIndex());
+      const selectedIndex = this._getSelectedIndex();
+      const providerName = this.props.searchResultManager.getActiveProviderName();
+      const query = this._getTextEditor().getText();
+      if (this.props.onSelectionChanged != null) {
+        this.props.onSelectionChanged(selectedIndex, providerName, query);
+      }
     });
   }
 
@@ -524,9 +499,10 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
   }
 
   _renderTabs() {
+    const workspace = atom.views.getView(atom.workspace);
     const tabs = this.state.renderableProviders.map(tab => {
       let keyBinding = null; // TODO
-      const humanizedKeybinding = _findKeybindingForAction(tab.action || '', this._modalNode);
+      const humanizedKeybinding = tab.action ? _findKeybindingForAction(tab.action, workspace) : '';
       if (humanizedKeybinding !== '') {
         keyBinding = _reactForAtom.React.createElement(
           'kbd',
@@ -556,9 +532,10 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
   }
 
   _openAll() {
-    (0, (_searchResultHelpers || _load_searchResultHelpers()).flattenResults)(this.state.resultsByService).forEach(result => {
-      this._emitter.emit('selected', result);
-    });
+    const selections = (0, (_searchResultHelpers || _load_searchResultHelpers()).flattenResults)(this.state.resultsByService);
+    const providerName = this.props.searchResultManager.getActiveProviderName();
+    const query = this._getTextEditor().getText();
+    this.props.onSelection(selections, providerName, query);
   }
 
   render() {
@@ -721,11 +698,7 @@ class QuickSelectionComponent extends _reactForAtom.React.Component {
       this._renderTabs(),
       _reactForAtom.React.createElement(
         'div',
-        {
-          className: 'omnisearch-results',
-          style: {
-            maxHeight: this.props.scrollableAreaHeightGap ? `calc(100vh - ${ this.props.scrollableAreaHeightGap }px)` : '100vh'
-          } },
+        { className: 'omnisearch-results' },
         _reactForAtom.React.createElement(
           'div',
           { className: 'omnisearch-pane' },
